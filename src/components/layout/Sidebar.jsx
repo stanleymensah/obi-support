@@ -15,7 +15,7 @@ export default function Sidebar() {
 
           <div className="links w-full flex flex-col gap-4">
             <NavLink
-              to="/"
+              to="/dashboard"
               className={({ isActive }) => (isActive ? "link-active" : "link")}
             >
               <LayoutGrid size={16} />

@@ -1,0 +1,70 @@
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { SquarePen, Trash2 } from "lucide-react";
+
+export default function TicketsTable({ tickets }) {
+  const getDisplayNumber = (ticket) => {
+    if (ticket.ticketNumber) return ticket.ticketNumber;
+    if (ticket.id) {
+      const numeric = String(ticket.id)
+        .split("")
+        .reduce((total, char, index) => {
+          return (total + char.charCodeAt(0) * (index + 1)) % 1000;
+        }, 0);
+
+      return String(numeric).padStart(3, "0");
+    }
+
+    return "000";
+  };
+
+  return (
+    <>
+      <Table>
+        <TableCaption>A list of all your tickets.</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-20">ID</TableHead>
+            <TableHead className="min-w-50">Title</TableHead>
+            <TableHead className="w-30">Priority</TableHead>
+            <TableHead className="w-25 text-right">Status</TableHead>
+            <TableHead className="w-37.5 text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {!tickets ||
+            (tickets.length === 0 && (
+              <div className="w-full px-16 flex items-center justify-center">
+                <p>No tickets</p>
+              </div>
+            ))}
+          {tickets.map((ticket) => (
+            <TableRow key={ticket.id}>
+              <TableCell className="font-medium py-2">
+                T-{getDisplayNumber(ticket)}
+              </TableCell>
+              <TableCell className="py-2">{ticket.title}</TableCell>
+              <TableCell className="py-2">{ticket.priority}</TableCell>
+              <TableCell className="text-right py-2">{ticket.status}</TableCell>
+              <TableCell className="text-right py-2 space-x-2">
+                <button className="text-red-500">
+                  <Trash2 size={16} />
+                </button>
+                <button className="text-blue-500">
+                  <SquarePen size={16} />
+                </button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </>
+  );
+}
