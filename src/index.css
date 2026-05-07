@@ -1,0 +1,74 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "IBM Plex Sans", sans-serif;
+
+  --color-azure-pop: oklch(65% 0.22 260);
+  --color-azure-surface: oklch(95% 0.02 260);
+
+  --color-rose-pop: oklch(65% 0.25 15);
+  --color-rose-surface: oklch(95% 0.02 15);
+
+  --color-lime-pop: oklch(80% 0.25 145);
+  --color-lime-surface: oklch(95% 0.02 145);
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    @apply w-full h-full;
+  }
+
+  body {
+    @apply font-sans m-0 overflow-hidden;
+  }
+
+  h1 {
+    @apply text-4xl md:text-6xl font-semibold tracking-tighter leading-tight;
+  }
+
+  h2 {
+    @apply text-2xl md:text-4xl font-semibold tracking-tight leading-snug;
+  }
+
+  h3 {
+    @apply text-xl md:text-xl font-medium tracking-tight;
+  }
+
+  p {
+    @apply text-base md:text-base leading-relaxed;
+  }
+
+  span {
+    @apply text-sm tracking-wide;
+  }
+
+  .border{
+    @apply border border-black/10;
+  }
+
+  main {
+    .link-active {
+      @apply text-azure-pop flex items-center gap-2 p-3 font-medium rounded-lg bg-white shadow-lg shadow-azure-pop/20 inset-shadow-sm inset-shadow-sky-500/10 border border-black/10;
+    }
+    .link {
+      @apply text-black/50 flex items-center gap-2 p-3;
+    }
+  }
+}
+
+@layer components {
+}
+
+.dark {
+  --color-azure-pop: oklch(75% 0.18 260);
+  --color-azure-surface: oklch(20% 0.05 260);
+
+  --color-rose-pop: oklch(70% 0.22 15);
+  --color-rose-surface: oklch(20% 0.05 15);
+
+  --color-lime-pop: oklch(85% 0.2 145);
+  --color-lime-surface: oklch(20% 0.05 145);
+}
