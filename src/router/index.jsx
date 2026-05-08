@@ -5,6 +5,7 @@ import Tickets from "../pages/tickets/Tickets";
 import Users from "../pages/users/Users";
 import Auth from "@/pages/auth/Auth";
 import UserPage from "@/pages/users/UserPage";
+import NotFound from "@/pages/NotFound";
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
       }
     ],
   },
+  {
+    path: "*",
+    element: <NotFound />
+  }
 ]);
 
 export default router;

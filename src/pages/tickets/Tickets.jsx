@@ -3,10 +3,46 @@ import { useTickets } from "@/hooks/useTickets";
 import { useState } from "react";
 import CreateTicketForm from "./CreateTicketForm";
 import Modal from "@/components/common/Modal";
+import { useDeleteTicket } from "@/hooks/useDeleteTicket";
+import ConfirmModal from "@/components/common/ConfirmModal";
+import EditTicketForm from "./EditTicketForm";
 
 export default function Tickets() {
   const { data: tickets, isLoading, error } = useTickets();
   const [isCreating, setIsCreating] = useState(false);
+  const deleteMutation = useDeleteTicket();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [ticketToDelete, setTicketToDelete] = useState(null);
+  const [ticketToEdit, setTicketToEdit] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const handleDelete = (ticketId) => {
+    setTicketToDelete(ticketId);
+    setIsDeleting(true);
+  };
+
+  const handleEdit = (ticket) => {
+    setTicketToEdit(ticket);
+    setIsEditing(true);
+  }
+
+  const handleCancelEdit = () => {
+    setTicketToEdit(null);
+    setIsEditing(false)
+  }
+
+  const handleConfirmDelete = () => {
+    if (ticketToDelete) {
+      deleteMutation.mutate(ticketToDelete);
+      setIsDeleting(false);
+      setTicketToDelete(null);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleting(false);
+    setTicketToDelete(null);
+  };
 
   if (isLoading) return <div>Loading tickets...</div>;
 
@@ -37,7 +73,7 @@ export default function Tickets() {
             </div>
           </div>
 
-          <TicketsTable tickets={tickets || []} />
+          <TicketsTable tickets={tickets || []} onDelete={handleDelete} onEdit={handleEdit} />
         </div>
 
         {error && (
@@ -50,9 +86,28 @@ export default function Tickets() {
       </div>
 
       {isCreating && (
-        <Modal size="sm" title="Create" onClose={() => setIsCreating(false)} >
-            <CreateTicketForm onClose={()=>setIsCreating(false)} />
+        <Modal size="sm" title="Create" onClose={() => setIsCreating(false)}>
+          <CreateTicketForm onClose={() => setIsCreating(false)}  />
         </Modal>
+      )}
+
+      {isEditing && (
+        <Modal size="sm" title="Edit Ticket" onClose={handleCancelEdit}>
+          <EditTicketForm ticket={ticketToEdit} onClose={handleCancelEdit} />
+        </Modal>
+      )}
+
+      
+
+      {isDeleting && (
+        <ConfirmModal
+          title="Confirm Delete"
+          message="Are you sure you want to delete this ticket? "
+          onApprove={handleConfirmDelete}
+          approve="Delete"
+          onCancel={handleCancelDelete}
+          onClose={handleCancelDelete}
+        />
       )}
     </>
   );

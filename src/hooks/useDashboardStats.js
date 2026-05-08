@@ -22,6 +22,7 @@ export function useDashboardStats() {
     const statusData = [
       { name: "Open", value: open, color: "#9EF56B" },
       { name: "Closed", value: closed, color: "#8E94F2" },
+      { name: "In-Prog", value: inProgress, color: "#6BB7F5" },
     ];
 
     const priorityData = [

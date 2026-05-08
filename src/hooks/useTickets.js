@@ -19,7 +19,7 @@ export function useTickets() {
 
     const ticketsRef = collection(db, "tickets");
     const q =
-      profile?.role === "admin"
+      profile
         ? query(ticketsRef, orderBy("createdAt", "desc"))
         : query(
             ticketsRef,

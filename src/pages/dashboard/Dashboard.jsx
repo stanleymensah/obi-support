@@ -1,5 +1,7 @@
 import StatCard from "@/components/ui/statCard";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
+import Status from "./Status";
+import Priority from "./Priority";
 
 export default function Dashboard() {
   const {
@@ -40,10 +42,20 @@ export default function Dashboard() {
 
         <div className="charts grid grid-cols-2 gap-2">
           <div className="pie-chart flex flex-col gap-2 border-black/10 bg-white shadow-sm inset-shadow-sm inset-shadow-azure-pop/10 rounded-sm py-3 px-4 col-span-1">
-            <h4>Tickets By Status</h4>
+            <div className="w-full`">
+              <h4>By Priority</h4>
+            </div>
+            <div className="status">
+              <Status data={priorityData} />
+            </div>
           </div>
           <div className="pie-chart flex flex-col gap-2 border-black/10 px-4 bg-white shadow-sm inset-shadow-sm inset-shadow-azure-pop/10 rounded-sm py-3 col-span-1">
-            <h4>Tickets By Priority</h4>
+            <div>
+              <h4>By Status</h4>
+            </div>
+            <div className="priority">
+              <Priority data={statusData} />
+            </div>
           </div>
         </div>
       </div>
