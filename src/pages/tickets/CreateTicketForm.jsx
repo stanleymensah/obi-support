@@ -1,4 +1,3 @@
-import { X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
@@ -8,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 export default function CreateTicketForm({ onClose }) {
   const { user, profile } = useAuth();
   const queryClient = useQueryClient();
+
 
   const buildTicketNumber = () => {
     const randomDigits = Math.floor(Math.random() * 1000);
@@ -61,19 +61,6 @@ export default function CreateTicketForm({ onClose }) {
 
   return (
     <>
-      <div className="bg-white rounded-xl w-120 border px-3 pt-2 pb-4 flex flex-col gap-2">
-        <div className="header flex items-center justify-between">
-          <span className="text-azure-pop font-medium">Create Ticket</span>
-          <button
-            className="border rounded-md p-1"
-            onClick={onClose}
-            aria-label="Close"
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        <div className="form p-1">
           <form
             className="flex flex-col gap-4"
             onSubmit={handleSubmit(onSubmit)}
@@ -173,7 +160,7 @@ export default function CreateTicketForm({ onClose }) {
                       message: "Please provide more detail",
                     },
                   })}
-                  rows={5}
+                  rows={3}
                   className="resize-none text-sm w-full bg-transparent outline-none"
                 ></textarea>
               </div>
@@ -202,8 +189,6 @@ export default function CreateTicketForm({ onClose }) {
               </button>
             </div>
           </form>
-        </div>
-      </div>
     </>
   );
 }

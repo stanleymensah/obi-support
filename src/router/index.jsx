@@ -4,6 +4,7 @@ import Dashboard from "../pages/dashboard/Dashboard";
 import Tickets from "../pages/tickets/Tickets";
 import Users from "../pages/users/Users";
 import Auth from "@/pages/auth/Auth";
+import UserPage from "@/pages/users/UserPage";
 
 const router = createBrowserRouter([
   {
@@ -22,9 +23,13 @@ const router = createBrowserRouter([
         element: <Tickets />,
       },
       {
-        path: "/users",
+        path: "/manage-users",
         element: <Users />,
       },
+      {
+        path: "/users/:id",
+        element: <UserPage />
+      }
     ],
   },
 ]);

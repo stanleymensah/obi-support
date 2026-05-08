@@ -4,36 +4,36 @@ import { NavLink } from "react-router-dom";
 export default function Sidebar() {
   return (
     <>
-      <div className="border rounded-xl flex flex-col gap-8 w-full h-full border-black/10 px-2 bg-white shadow-sm inset-shadow-sm inset-shadow-azure-pop/10">
+      <div className="border rounded-sm flex flex-col gap-4 w-full h-full border-black/10 px-2 bg-white shadow-sm inset-shadow-sm inset-shadow-azure-pop/10">
         <div className="top flex items-center gap-2 w-full justify-center h-12">
-          <img src="/images/help.png" alt="" className="w-6" />
-          <h3 className="text-azure-pop">Obi Support</h3>
+          <img src="/images/help.png" alt="" className="w-4" />
+          <h4 className="text-azure-dark">Obi Support</h4>
         </div>
 
         <div className="links-container flex flex-col gap-3">
-          <text className="uppercase text-xs">menu</text>
+          <span className="uppercase text-xs">menu</span>
 
-          <div className="links w-full flex flex-col gap-4">
+          <div className="links w-full flex flex-col gap-2">
             <NavLink
               to="/dashboard"
               className={({ isActive }) => (isActive ? "link-active" : "link")}
             >
               <LayoutGrid size={16} />
-              <text className="text-sm md:text-base">Dashboard</text>
+              <p className="text-xs md:text-sm">Dashboard</p>
             </NavLink>
             <NavLink
               to="/tickets"
               className={({ isActive }) => (isActive ? "link-active" : "link")}
             >
               <Ticket size={16} />
-              <text className="text-sm md:text-base">Tickets</text>
+              <text className="text-xs md:text-sm">Ticket</text>
             </NavLink>
             <NavLink
-              to="/users"
+              to="/manage-users"
               className={({ isActive }) => (isActive ? "link-active" : "link")}
             >
               <UserRoundCog size={16} />
-              <text className="text-sm md:text-base">Manage Users</text>
+              <text className="text-xs md:text-sm">Manage User</text>
             </NavLink>
           </div>
         </div>

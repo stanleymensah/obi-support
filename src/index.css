@@ -9,7 +9,8 @@
 @theme {
   --font-sans: "IBM Plex Sans", sans-serif;
 
-  --color-azure-pop: oklch(65% 0.22 260);
+  --color-azure-pop: oklch(65% 0.32 260);
+  --color-azure-dark: oklch(0.5893 0.32 260);
   --color-azure-surface: oklch(95% 0.02 260);
 
   --color-rose-pop: oklch(65% 0.25 15);
@@ -42,8 +43,12 @@
     @apply text-xl md:text-xl font-medium tracking-tight;
   }
 
+  h4{
+    @apply text-sm font-medium tracking-tight;
+  }
+
   p {
-    @apply text-base md:text-base leading-relaxed;
+    @apply text-xs md:text-sm leading-relaxed;
   }
 
   span {
@@ -60,10 +65,10 @@
 
   main {
     .link-active {
-      @apply text-azure-pop flex items-center gap-2 p-3 font-medium rounded-lg bg-white shadow-lg shadow-azure-pop/20 inset-shadow-sm inset-shadow-sky-500/10 border border-black/10;
+      @apply text-azure-pop flex items-center gap-2 py-1 px-3 font-medium rounded-sm bg-white shadow-sm shadow-azure-pop/20 inset-shadow-sm inset-shadow-sky-500/10 border border-black/10;
     }
     .link {
-      @apply text-black/50 flex items-center gap-2 p-3;
+      @apply text-black/50 flex items-center gap-2 py-1 px-3;
     }
   }
   * {

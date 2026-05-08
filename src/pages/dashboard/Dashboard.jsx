@@ -1,7 +1,23 @@
+import StatCard from "@/components/ui/statCard";
+import { useDashboardStats } from "@/hooks/useDashboardStats";
+
 export default function Dashboard() {
+  const {
+    total,
+    open,
+    closed,
+    high,
+    medium,
+    statusData,
+    priorityData,
+    isLoading,
+  } = useDashboardStats();
+
+  if (isLoading) return <div>Loading...</div>;
+
   return (
     <>
-      <div className="container w-full flex flex-col gap-4 h-full px-2">
+      <div className="container w-full flex flex-col gap-4 h-full">
         <div className="relative hero h-48">
           <img
             src="/images/banner.jpg"
@@ -14,39 +30,20 @@ export default function Dashboard() {
           </div>
 
           <div className="cards absolute z-10 bottom-3 left-3 right-3 grid grid-cols-5 gap-2">
-            <div className="card border border-white/10 bg-white rounded-lg p-3 col-span-1">
-              <h3>234</h3>
-              <span>Total tickets</span>
-            </div>
-            <div className="card border border-white/10 bg-white rounded-lg p-3 col-span-1">
-              <h3>234</h3>
-              <span>Total tickets</span>
-            </div>
-            <div className="card border border-white/10 bg-white rounded-lg p-3 col-span-1">
-              <h3>234</h3>
-              <span>Total tickets</span>
-            </div>
-            <div className="card border border-white/10 bg-white rounded-lg p-3 col-span-1">
-              <h3>234</h3>
-              <span>Total tickets</span>
-            </div>
-            <div className="card border border-white/10 bg-white rounded-lg p-3 col-span-1">
-              <h3>234</h3>
-              <span>Total tickets</span>
-            </div>
+            <StatCard value={total} label="Total" />
+            <StatCard value={open} label="Open" />
+            <StatCard value={closed} label="Closed" />
+            <StatCard value={high} label="High" />
+            <StatCard value={medium} label="Medium" />
           </div>
         </div>
 
         <div className="charts grid grid-cols-2 gap-4">
           <div className="pie-chart flex flex-col gap-2 border-black/10 bg-white shadow-sm inset-shadow-sm inset-shadow-azure-pop/10 rounded-xl py-3 px-4 col-span-1">
-          <h3>Tickets By Status</h3>
-
-          
+            <h4>Tickets By Status</h4>
           </div>
           <div className="pie-chart flex flex-col gap-2 border-black/10 px-4 bg-white shadow-sm inset-shadow-sm inset-shadow-azure-pop/10 rounded-xl py-3 col-span-1">
-          <h3>Tickets By Status</h3>
-
-
+            <h4>Tickets By Priority</h4>
           </div>
         </div>
       </div>
