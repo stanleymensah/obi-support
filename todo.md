@@ -1,25 +1,48 @@
-Create a user code
+export default function Layout() {
+  const [dropdown, setDropdown] = useState(false);
 
-import { doc, setDoc } from "firebase/firestore";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+  return (
+    <>
+      <main className="relative w-full grid grid-cols-12 gap-4 p-4 h-screen overflow-hidden bg-linear-to-b from-azure-surface via-azure-pop/10 to-azure-pop/20">
+        <div className="col-span-2 h-full">
+          <Sidebar />
+        </div>
 
-const signUp = async (email, password, firstName, lastName) => {
-  const res = await createUserWithEmailAndPassword(auth, email, password);
-  
-  // Create the profile document in the 'users' collection
-  await setDoc(doc(db, "users", res.user.uid), {
-    firstName,
-    lastName,
-    role: "user", // Default role
-    email
-  });
-};
+        <div className="col-span-10 h-full flex flex-col gap-2 relative">
+          {/* Use the toggle logic correctly here */}
+          <Header onProfileClick={() => setDropdown(!dropdown)} />
 
+          <div className="flex-1 overflow-auto">
+            <Outlet />
+          </div>
 
-HEADER CODE FORM
-<div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold">Welcome back!</h1>
-        <p className="text-xs text-gray-600">
-          Enter to get unlimited access to data & information
-        </p>
-</div>
+          {/* Dropdown - Positioned relative to the col-span-10 container */}
+          {dropdown && (
+            <div className="bg-white border absolute z-50 top-16 right-0 flex flex-col min-w-40 rounded-md shadow-xl py-1 overflow-hidden">
+              <button 
+                className="flex items-center gap-3 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+                onClick={() => setDropdown(false)}
+              >
+                <UserRound size={16} /> 
+                <span>Profile</span>
+              </button>
+              
+              <hr className="border-gray-100" />
+              
+              <button 
+                className="flex items-center gap-3 px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors"
+                onClick={() => {
+                  /* handle Logout logic here */
+                  setDropdown(false);
+                }}
+              >
+                <LogOut size={16}/> 
+                <span>Logout</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </main>
+    </>
+  );
+}

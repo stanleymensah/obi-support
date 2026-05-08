@@ -1,9 +1,28 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
-// import { Plus } from "lucide-react";
+import { Link } from "react-router-dom";
 import Header from "./Header";
+import { useState } from "react";
+import { LogOut, UserRound } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { signOut } from "firebase/auth";
+import { auth } from "@/lib/firebase";
+import { useNavigate } from "react-router-dom";
 
 export default function Layout() {
+  const [dropdown, setDropdown] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const hanldeLogout = async () => {
+    try {
+      setDropdown(false);
+      await signOut(auth);
+      navigate("/");
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
 
   return (
     <>
@@ -13,20 +32,48 @@ export default function Layout() {
         </div>
 
         <div className="col-span-10 h-full min-h-0 overflow-auto flex flex-col gap-2">
-          <Header/>
-          <Outlet />
+          <Header showDropdown={() => setDropdown(!dropdown)} />
 
-          {/* <div className="absolute z-30 bottom-8 right-8 transition-opacity opacity-50 hover:opacity-100 md:hidden">
-            <button
-              className="create-ticket p-3 bg-azure-pop text-white rounded-full shadow-lg"
-              onClick={() => setIsCreating(true)}
-            >
-              <Plus />
-            </button>
-          </div> */}
-
+          <div className="flex-1 overflow-auto">
+            <Outlet />
+          </div>
         </div>
       </main>
+      {dropdown && (
+        <>
+          {/* 1. Invisible Full-Screen Backdrop */}
+          <div
+            className="fixed inset-0 z-40 bg-transparent" // fixed covers the whole screen
+            onClick={() => setDropdown(false)}
+          />
+
+          {/* 2. The Menu (Z-index must be higher than backdrop) */}
+          <div className="bg-white border absolute z-50 top-16 right-4 flex flex-col px-2 rounded-md shadow-xl py-1 overflow-hidden min-w-35">
+            <button
+              className="w-full text-left"
+              onClick={() => setDropdown(false)}
+            >
+              <Link
+                to={`/users/${user?.uid}`}
+                className="flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-gray-50 transition-colors"
+              >
+                <UserRound size={14} />
+                <span className="text-xs">Profile</span>
+              </Link>
+            </button>
+
+            <hr className="border-gray-100" />
+
+            <button
+              className="flex items-center gap-3 px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors w-full"
+              onClick={hanldeLogout}
+            >
+              <LogOut size={14} />
+              <span className="text-xs">Logout</span>
+            </button>
+          </div>
+        </>
+      )}
     </>
   );
 }
