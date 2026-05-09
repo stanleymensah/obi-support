@@ -1,7 +1,9 @@
 import { LayoutGrid, Ticket, UserRoundCog } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Sidebar() {
+  const { profile } = useAuth();
   return (
     <>
       <div className="border rounded-sm flex flex-col gap-4 w-full h-full border-black/10 px-2 bg-white shadow-sm inset-shadow-sm inset-shadow-azure-pop/10">
@@ -28,13 +30,21 @@ export default function Sidebar() {
               <Ticket size={16} />
               <text className="text-xs md:text-sm">Ticket</text>
             </NavLink>
-            <NavLink
-              to="/manage-users"
-              className={({ isActive }) => (isActive ? "link-active" : "link")}
-            >
-              <UserRoundCog size={16} />
-              <text className="text-xs md:text-sm">Manage User</text>
-            </NavLink>
+            {profile?.role === "admin" ? (
+              <>
+                <NavLink
+                  to="/manage-users"
+                  className={({ isActive }) =>
+                    isActive ? "link-active" : "link"
+                  }
+                >
+                  <UserRoundCog size={16} />
+                  <text className="text-xs md:text-sm">Manage User</text>
+                </NavLink>
+              </>
+            ) : (
+              ""
+            )}
           </div>
         </div>
       </div>

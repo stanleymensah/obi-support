@@ -12,6 +12,7 @@ export function useDashboardStats() {
     const total = allTickets.length;
     const open = allTickets.filter((t) => t.status === "Open").length;
     const closed = allTickets.filter((t) => t.status === "Closed").length;
+    const assigned = allTickets.filter(t => t.assignee !== "").length
     const inProgress = allTickets.filter(
       (t) => t.status === "In Progress",
     ).length;
@@ -23,6 +24,7 @@ export function useDashboardStats() {
       { name: "Open", value: open, color: "#9EF56B" },
       { name: "Closed", value: closed, color: "#8E94F2" },
       { name: "In-Prog", value: inProgress, color: "#6BB7F5" },
+      {name: "Assigned", value: assigned, color: "#267352" }
     ];
 
     const priorityData = [
@@ -49,6 +51,7 @@ export function useDashboardStats() {
       inProgress,
       medium,
       low,
+      assigned
     };
   }, [tickets]);
 

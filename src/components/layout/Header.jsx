@@ -7,7 +7,7 @@ export default function Header({ showDropdown }) {
   return (
     <>
       <header className="h-12 rounded-sm border shadow-sm px-4 flex items-center bg-white justify-end gap-2">
-        <div className="user flex items-center gap-1 cursor-pointer" onClick={showDropdown}>
+        <div className="user flex items-center gap-2 cursor-pointer" onClick={showDropdown}>
           <div className="img w-7">
             <img
               src="/images/pfp.jpg"

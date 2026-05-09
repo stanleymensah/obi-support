@@ -1,4 +1,5 @@
 import { useAuth } from "@/context/AuthContext";
+import { formatDate } from "@/lib/utils";
 
 export default function UserPage() {
   // eslint-disable-next-line no-unused-vars
@@ -31,16 +32,7 @@ export default function UserPage() {
               </div>
               <span>{profile ? `${profile?.email}` : "Null"}</span>
               <span>
-                Joined:{" "}
-                {profile
-                  ? `${profile?.createdAt
-                      ?.toDate()
-                      .toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}`
-                  : "Null"}
+                Joined:{formatDate(profile?.createdAt)}
               </span>
             </div>
           </div>

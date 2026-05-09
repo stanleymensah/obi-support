@@ -6,7 +6,11 @@ import Modal from "@/components/common/Modal";
 import { useDeleteTicket } from "@/hooks/useDeleteTicket";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import EditTicketForm from "./EditTicketForm";
-import TicketDetails from "./TicketDetails"
+import TicketDetails from "./TicketDetails";
+import { Search } from "lucide-react";
+import { useDebounce } from "@/hooks/useDebounce";
+import TicketComments from "./Comments";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Tickets() {
   const { data: tickets, isLoading, error } = useTickets();
@@ -18,16 +22,41 @@ export default function Tickets() {
   const [isEditing, setIsEditing] = useState(false);
   const [isViewing, setIsViewing] = useState(false);
   const [ticketToView, setTicketToView] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isComment, setIsComment] = useState(false);
+  const [commentTicket, setCommentTicket] = useState(null);
+  const { profile } = useAuth();
+
+  const debouncedSearch = useDebounce(searchTerm);
+
+  const filteredTickets = (tickets || []).filter((ticket) => {
+    const query = debouncedSearch.toLowerCase();
+    return (
+      ticket.title?.toLowerCase().includes(query) ||
+      ticket.description?.toLowerCase().includes(query) ||
+      ticket.email?.toLowerCase().includes(query)
+    );
+  });
+
+  const handleComment = (ticket) => {
+    setCommentTicket(ticket);
+    setIsComment(true);
+  };
+
+  const handleCloseComment = () => {
+    setCommentTicket(null);
+    setIsComment(false);
+  };
 
   const handleView = (ticket) => {
     setTicketToView(ticket);
     setIsViewing(true);
-  }
+  };
 
   const handleCloseView = () => {
     setTicketToView(null);
     setIsViewing(false);
-  }
+  };
 
   const handleDelete = (ticketId) => {
     setTicketToDelete(ticketId);
@@ -37,12 +66,12 @@ export default function Tickets() {
   const handleEdit = (ticket) => {
     setTicketToEdit(ticket);
     setIsEditing(true);
-  }
+  };
 
   const handleCancelEdit = () => {
     setTicketToEdit(null);
-    setIsEditing(false)
-  }
+    setIsEditing(false);
+  };
 
   const handleConfirmDelete = () => {
     if (ticketToDelete) {
@@ -67,26 +96,40 @@ export default function Tickets() {
         </div>
 
         <div className="w-full px-4 flex flex-col gap-2">
-          <div className="w-full flex items-center justify-between">
-            <div className="search border py-1.5 px-3 rounded-sm flex items-center w-1/2">
+          <div className="w-full flex items-center justify-between text-gray-600">
+            <div className="search border py-1.5 px-3 rounded-sm flex items-center gap-1 w-1/2">
+              <Search size={14} />
               <input
                 type="text"
                 placeholder="Search by title, description, email..."
                 className="text-xs w-full"
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-
-            <div className="create-new">
-              <button
-                className="create text-sm bg-azure-pop text-white px-3 py-1 rounded-xs"
-                onClick={() => setIsCreating(true)}
-              >
-                Create
-              </button>
-            </div>
+            {profile?.role === "admin" ? (
+              <>
+                <div className="create-new">
+                  <button
+                    className="create text-sm bg-azure-pop text-white px-3 py-1 rounded-xs"
+                    onClick={() => setIsCreating(true)}
+                  >
+                    Create
+                  </button>
+                </div>
+              </>
+            ) : (
+              ""
+            )}
           </div>
 
-          <TicketsTable tickets={tickets || []} onDelete={handleDelete} onEdit={handleEdit} onView={handleView} />
+          <TicketsTable
+            tickets={filteredTickets}
+            onDelete={handleDelete}
+            onEdit={handleEdit}
+            onView={handleView}
+            onComment={handleComment}
+            profile={profile}
+          />
         </div>
 
         {error && (
@@ -100,7 +143,13 @@ export default function Tickets() {
 
       {isCreating && (
         <Modal size="sm" title="Create" onClose={() => setIsCreating(false)}>
-          <CreateTicketForm onClose={() => setIsCreating(false)}  />
+          <CreateTicketForm onClose={() => setIsCreating(false)} />
+        </Modal>
+      )}
+
+      {isComment && (
+        <Modal size="sm" title="Comment" onClose={handleCloseComment}>
+          <TicketComments ticketId={commentTicket.id} profile={profile} />
         </Modal>
       )}
 
@@ -110,13 +159,11 @@ export default function Tickets() {
         </Modal>
       )}
 
-      {
-        isViewing && (
-          <Modal size="md" title={ticketToView.title} onClose={handleCloseView} >
-              <TicketDetails ticket={ticketToView} />
-          </Modal>
-        )
-      }
+      {isViewing && (
+        <Modal size="sm" title={ticketToView.title} onClose={handleCloseView}>
+          <TicketDetails ticket={ticketToView} />
+        </Modal>
+      )}
 
       {isDeleting && (
         <ConfirmModal

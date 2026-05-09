@@ -7,12 +7,12 @@ import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDkH0Pg0KudTRunCOgYAr0fgAwx0bWwiCY",
-  authDomain: "obi-support.firebaseapp.com",
-  projectId: "obi-support",
-  storageBucket: "obi-support.firebasestorage.app",
-  messagingSenderId: "60568151591",
-  appId: "1:60568151591:web:a56558cf128da100e85002"
+  apiKey: "AIzaSyCwD3Q-mVkJxCe3RrH2PLAgvHo7iECPLeg",
+  authDomain: "obi-support-5be65.firebaseapp.com",
+  projectId: "obi-support-5be65",
+  storageBucket: "obi-support-5be65.firebasestorage.app",
+  messagingSenderId: "727221359174",
+  appId: "1:727221359174:web:e1af3c4feb5a80cec6b047"
 };
 
 // Initialize Firebase

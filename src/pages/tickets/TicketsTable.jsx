@@ -8,8 +8,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { SquarePen, Trash2, MessageCircleMore } from "lucide-react";
+import { formatRelativeTime } from "@/lib/utils";
 
-export default function TicketsTable({ tickets, onDelete, onEdit, onView }) {
+export default function TicketsTable({ tickets,onComment, onDelete, onEdit, onView, profile }) {
   const getDisplayNumber = (ticket) => {
     if (ticket.ticketNumber) return ticket.ticketNumber;
     if (ticket.id) {
@@ -38,6 +39,7 @@ export default function TicketsTable({ tickets, onDelete, onEdit, onView }) {
           <TableRow>
             <TableHead className="w-20">ID</TableHead>
             <TableHead className="min-w-50">Title</TableHead>
+            <TableHead className="w-30">Created</TableHead>
             <TableHead className="w-30">Priority</TableHead>
             <TableHead className="w-25 text-right">Status</TableHead>
             <TableHead className="w-37.5 text-right">Actions</TableHead>
@@ -55,13 +57,19 @@ export default function TicketsTable({ tickets, onDelete, onEdit, onView }) {
                 T-{getDisplayNumber(ticket)}
               </TableCell>
               <TableCell className="py-2">{ticket.title}</TableCell>
+              <TableCell className="py-2">{formatRelativeTime(ticket.createdAt)}</TableCell>
               <TableCell className="py-2">{ticket.priority}</TableCell>
               <TableCell className="text-right py-2">{ticket.status}</TableCell>
               <TableCell className="text-right py-2 flex items-center justify-end gap-1 space-x-2">
-                <button className="text-gray-600">
+                <button className="text-gray-600"  onClick={(e) => {
+                    e.stopPropagation();
+                    onComment(ticket);
+                  }} >
                   <MessageCircleMore size={16} />{" "}
                 </button>
-                <button
+                  {profile?.role === "admin" ?
+                  <>
+                  <button
                   className="text-blue-500"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -79,6 +87,9 @@ export default function TicketsTable({ tickets, onDelete, onEdit, onView }) {
                 >
                   <Trash2 size={16} />
                 </button>
+                  </>
+                  : "" }
+                
               </TableCell>
             </TableRow>
           ))}
