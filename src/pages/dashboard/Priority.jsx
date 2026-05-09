@@ -17,7 +17,7 @@ export default function Priority({data}) {
           data={data}
           margin={{ top: 5, right: 5, left: -10, bottom: 5 }}
         >
-          <CartesianGrid strokeDasharray="3 3" vertical={false} strokeWidth={0.5} />
+          <CartesianGrid vertical={false} strokeWidth={0.5} />
           <XAxis
             dataKey="name"
             tick={{ fontSize: 11, dy: 10 }}
@@ -50,8 +50,8 @@ export default function Priority({data}) {
           />
           <Bar
             dataKey="value"
-            background={{ fill: "#e6e6e6", radius: [6, 6, 6, 6] }}
-            radius={[6, 6, 6, 6]}
+            // background={{ fill: "#e6e6e6", radius: [6, 6, 6, 6] }}
+            radius={[4, 4, 4, 4]}
             barSize={35}
           >
             {data.map((entry, index) => (

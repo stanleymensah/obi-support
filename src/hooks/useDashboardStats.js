@@ -13,7 +13,7 @@ export function useDashboardStats() {
     const open = allTickets.filter((t) => t.status === "Open").length;
     const closed = allTickets.filter((t) => t.status === "Closed").length;
     const inProgress = allTickets.filter(
-      (t) => t.status === "In-Progress",
+      (t) => t.status === "In Progress",
     ).length;
     const high = allTickets.filter((t) => t.priority === "High").length;
     const medium = allTickets.filter((t) => t.priority === "Medium").length;

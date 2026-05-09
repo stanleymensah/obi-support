@@ -66,10 +66,10 @@ export default function CreateTicketForm({ onClose }) {
             onSubmit={handleSubmit(onSubmit)}
           >
             <div className="title">
-              <label className="label text-sm font-medium text-gray-600 ">
+              <label className="label text-xs font-medium text-gray-600 ">
                 Title
               </label>
-              <div className="border py-2 px-3 rounded-md flex items-center">
+              <div className="border py-1.5 px-3 rounded-sm flex items-center">
                 <input
                   {...register("title", {
                     required: "Title is required",
@@ -80,7 +80,7 @@ export default function CreateTicketForm({ onClose }) {
                   })}
                   type="text"
                   placeholder="Title must be at least 5 chars"
-                  className="text-sm w-full bg-transparent outline-none"
+                  className="text-xs w-full bg-transparent outline-none"
                 />
               </div>
               {errors.title && (
@@ -92,10 +92,10 @@ export default function CreateTicketForm({ onClose }) {
 
             <div className="email-ems grid grid-cols-3 gap-2">
               <div className="email col-span-1">
-                <label className="label text-sm font-medium text-gray-600 ">
+                <label className="label text-xs font-medium text-gray-600 ">
                   Email
                 </label>
-                <div className="border py-2 px-3 rounded-md flex items-center">
+                <div className="border py-1.5 px-3 rounded-sm flex items-center">
                   <input
                     {...register("email", {
                       required: "Email required",
@@ -106,7 +106,7 @@ export default function CreateTicketForm({ onClose }) {
                     })}
                     type="email"
                     placeholder="Enter a valid email"
-                    className="text-sm w-full bg-transparent outline-none"
+                    className="text-xs w-full bg-transparent outline-none"
                   />
                 </div>
                 {errors.email && (
@@ -117,13 +117,13 @@ export default function CreateTicketForm({ onClose }) {
               </div>
 
               <div className="email col-span-1">
-                <label className="label text-sm font-medium text-gray-600 ">
+                <label className="label text-xs font-medium text-gray-600 ">
                   Priority
                 </label>
-                <div className="border py-2 px-3 rounded-md flex items-center">
+                <div className="border py-1.5 px-3 rounded-sm flex items-center">
                   <select
                     {...register("priority", { required: true })}
-                    className="text-sm w-full bg-transparent outline-none"
+                    className="text-xs w-full bg-transparent outline-none"
                   >
                     <option>High</option>
                     <option>Medium</option>
@@ -133,25 +133,25 @@ export default function CreateTicketForm({ onClose }) {
               </div>
 
               <div className="email col-span-1">
-                <label className="label text-sm font-medium text-gray-600 ">
+                <label className="label text-xs font-medium text-gray-600 ">
                   Assign to
                 </label>
-                <div className="border py-2 px-3 rounded-md flex items-center">
+                <div className="border py-1.5 px-3 rounded-sm flex items-center">
                   <input
                     {...register("assignee")}
                     type="text"
                     placeholder="Assignee name"
-                    className="text-sm w-full bg-transparent outline-none"
+                    className="text-xs w-full bg-transparent outline-none"
                   />
                 </div>
               </div>
             </div>
 
             <div className="title">
-              <label className="label text-sm font-medium text-gray-600 ">
+              <label className="label text-xs font-medium text-gray-600 ">
                 Description
               </label>
-              <div className="border py-2 px-3 rounded-md flex items-center">
+              <div className="border py-1.5 px-3 rounded-sm flex items-center">
                 <textarea
                   {...register("description", {
                     required: "Description required",
@@ -161,7 +161,7 @@ export default function CreateTicketForm({ onClose }) {
                     },
                   })}
                   rows={3}
-                  className="resize-none text-sm w-full bg-transparent outline-none"
+                  className="resize-none text-xs w-full bg-transparent outline-none"
                 ></textarea>
               </div>
               {errors.description && (
@@ -174,7 +174,7 @@ export default function CreateTicketForm({ onClose }) {
             <div className="buttons flex items-center justify-end gap-4">
               <button
                 type="button"
-                className="border py-1 px-2 text-sm rounded-sm"
+                className="border py-1 px-2 text-xs rounded-sm"
                 onClick={onClose}
               >
                 Cancel
@@ -183,7 +183,7 @@ export default function CreateTicketForm({ onClose }) {
               <button
                 type="submit"
                 disabled={mutation.isPending}
-                className="py-1 border px-2 text-sm rounded-sm bg-azure-pop text-white"
+                className="py-1 border px-2 text-xs rounded-sm bg-azure-pop text-white"
               >
                 {mutation.isPending ? "Creating..." : "Create"}
               </button>

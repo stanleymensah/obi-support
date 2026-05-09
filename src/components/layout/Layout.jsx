@@ -1,17 +1,16 @@
-import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, Outlet, Navigate } from "react-router-dom";
 import Header from "./Header";
 import { useState } from "react";
 import { LogOut, UserRound } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { useNavigate } from "react-router-dom";
 
 export default function Layout() {
   const [dropdown, setDropdown] = useState(false);
-  const { user } = useAuth();
+  // eslint-disable-next-line no-unused-vars
+  const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
 
   const hanldeLogout = async () => {
@@ -23,6 +22,12 @@ export default function Layout() {
       console.log(err.message);
     }
   };
+
+  if (loading) return <div>Loading Profile...</div>;
+
+  if (!profile) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <>

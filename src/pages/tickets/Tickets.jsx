@@ -6,6 +6,7 @@ import Modal from "@/components/common/Modal";
 import { useDeleteTicket } from "@/hooks/useDeleteTicket";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import EditTicketForm from "./EditTicketForm";
+import TicketDetails from "./TicketDetails"
 
 export default function Tickets() {
   const { data: tickets, isLoading, error } = useTickets();
@@ -15,6 +16,18 @@ export default function Tickets() {
   const [ticketToDelete, setTicketToDelete] = useState(null);
   const [ticketToEdit, setTicketToEdit] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isViewing, setIsViewing] = useState(false);
+  const [ticketToView, setTicketToView] = useState(null);
+
+  const handleView = (ticket) => {
+    setTicketToView(ticket);
+    setIsViewing(true);
+  }
+
+  const handleCloseView = () => {
+    setTicketToView(null);
+    setIsViewing(false);
+  }
 
   const handleDelete = (ticketId) => {
     setTicketToDelete(ticketId);
@@ -73,7 +86,7 @@ export default function Tickets() {
             </div>
           </div>
 
-          <TicketsTable tickets={tickets || []} onDelete={handleDelete} onEdit={handleEdit} />
+          <TicketsTable tickets={tickets || []} onDelete={handleDelete} onEdit={handleEdit} onView={handleView} />
         </div>
 
         {error && (
@@ -97,7 +110,13 @@ export default function Tickets() {
         </Modal>
       )}
 
-      
+      {
+        isViewing && (
+          <Modal size="md" title={ticketToView.title} onClose={handleCloseView} >
+              <TicketDetails ticket={ticketToView} />
+          </Modal>
+        )
+      }
 
       {isDeleting && (
         <ConfirmModal

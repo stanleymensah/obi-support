@@ -27,7 +27,7 @@ export function AuthProvider({ children }) {
   return (
     <>
       <AuthContext.Provider
-        value={{ user, profile, isAdmin: profile?.role === "admin" }}
+        value={{ loading, user, profile, isAdmin: profile?.role === "admin" }}
       >
         {!loading && children}
       </AuthContext.Provider>
