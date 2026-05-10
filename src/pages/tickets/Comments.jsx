@@ -35,7 +35,7 @@ export default function TicketComments({ ticketId, profile }) {
   };
 
   return (
-    <div className="flex flex-col h-[450px]">
+    <div className="flex flex-col h-112.5">
       <div className="flex-1 overflow-y-auto p-2 space-y-4">
         {comments?.map((comment) => (
           <div key={comment.id} className="flex flex-col gap-1">
