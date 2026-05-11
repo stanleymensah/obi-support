@@ -26,3 +26,19 @@ export const formatRelativeTime = (timestamp) => {
   return formatDistanceToNow(timestamp.toDate(), { addSuffix: true });
 };
 // Result: "5 minutes ago" or "2 days ago"
+
+export const sortByCreatedAt = (items, sortOrder = "asc") => {
+  const toMillis = (value) => {
+    if (!value) return 0;
+    if (typeof value.toMillis === "function") return value.toMillis();
+    if (typeof value.seconds === "number") return value.seconds * 1000;
+    const parsed = new Date(value).getTime();
+    return Number.isNaN(parsed) ? 0 : parsed;
+  };
+
+  return [...items].sort((left, right) => {
+    const leftTime = toMillis(left.createdAt);
+    const rightTime = toMillis(right.createdAt);
+    return sortOrder === "asc" ? leftTime - rightTime : rightTime - leftTime;
+  });
+};

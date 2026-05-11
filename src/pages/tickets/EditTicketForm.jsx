@@ -1,11 +1,11 @@
 import { useForm } from "react-hook-form";
 import { db } from "@/lib/firebase";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, collection, getDocs, query, where, orderBy } from "firebase/firestore";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/context/AuthContext";
 
 export default function EditTicketForm({ onClose, ticket }) {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const queryClient = useQueryClient();
 
   const {
@@ -29,7 +29,20 @@ export default function EditTicketForm({ onClose, ticket }) {
       return await updateDoc(ticketRef, updatedData);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tickets", user?.uid] });
+      (async () => {
+        try {
+          const ticketsRef = collection(db, "tickets");
+          const q =
+            profile
+              ? query(ticketsRef, orderBy("createdAt", "desc"))
+              : query(ticketsRef, where("userId", "==", user.uid), orderBy("createdAt", "desc"));
+          const snapshot = await getDocs(q);
+          const tickets = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+          queryClient.setQueryData(["tickets", user?.uid], tickets);
+        } catch (e) {
+          queryClient.invalidateQueries({ queryKey: ["tickets", user?.uid] });
+        }
+      })();
       if (onClose) onClose();
     },
   });

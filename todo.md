@@ -4,3 +4,4 @@
 4. User tickets
 <!-- 5. manage users -> admin -->
 6. ticket status/prioroty colors & badge component
+7. filter and sorting

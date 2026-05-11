@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 
@@ -9,14 +9,30 @@ export default function SignIn() {
   const {
     register,
     handleSubmit,
+    getValues,
+    setError,
+    clearErrors,
     formState: { errors, isSubmitting },
   } = useForm();
 
   const onSubmit = async (data) => {
     try {
+      clearErrors("email");
+
+      const email = data.email.trim().toLowerCase();
+      const existingMethods = await fetchSignInMethodsForEmail(auth, email);
+
+      if (existingMethods.length > 0) {
+        setError("email", {
+          type: "validate",
+          message: "This email is already registered.",
+        });
+        return;
+      }
+
       const userCredential = await createUserWithEmailAndPassword(
         auth,
-        data.email,
+        email,
         data.password,
       );
       const user = userCredential.user;
@@ -24,7 +40,7 @@ export default function SignIn() {
       await setDoc(doc(db, "users", user.uid), {
         firstName: data.firstName,
         lastName: data.lastName,
-        email: data.email,
+        email,
         role: "user",
         createdAt: new Date(),
       });
@@ -119,11 +135,7 @@ export default function SignIn() {
           <input
             {...register("confirmPassword", {
               required: "Confirm Password!",
-              validate: (value, formValues) => {
-                return (
-                  value === formValues.password || "Passwords do not match!"
-                );
-              },
+              validate: (value) => value === getValues("password") || "Passwords do not match!",
             })}
             type="password"
             placeholder="Confirm your password"

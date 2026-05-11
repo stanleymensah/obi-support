@@ -1,7 +1,7 @@
 import { Search } from "lucide-react";
 import UsersTable from "./UsersTable";
 import { useUsers } from "@/hooks/useUsers";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useDeleteUser } from "@/hooks/useDeleteUser";
 import Modal from "@/components/common/Modal";
@@ -11,6 +11,7 @@ import EditUserForm from "./EditUserForm";
 import UserDetails from "./UserDetails";
 import usePagination from "@/hooks/usePagination";
 import Pagination from "@/components/common/Pagination";
+import { sortByCreatedAt } from "@/lib/utils";
 
 export default function Users() {
   const { data: users, isLoading, error } = useUsers();
@@ -23,9 +24,16 @@ export default function Users() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isViewing, setIsViewing] = useState(false);
   const [userToView, setUserToView] = useState(null);
+  const [sortOrder, setSortOrder] = useState("asc");
 
   const debouncedSearch = useDebounce(searchTerm);
-  const filteredUsers = (users || []).filter((user) => {
+
+  const sortedUsers = useMemo(() => {
+    return sortByCreatedAt(users || [], sortOrder);
+  }, [users, sortOrder]);
+
+
+  const filteredUsers = sortedUsers.filter((user) => {
     const query = debouncedSearch.toLowerCase();
     return (
       user.firstName?.toLowerCase().includes(query) ||
@@ -73,6 +81,10 @@ export default function Users() {
     setUserToDelete(null);
   };
 
+  const handleToggleSort = () => {
+    setSortOrder((current) => (current === "asc" ? "desc" : "asc"));
+  };
+
   if (isLoading) return <div>Loading users...</div>;
 
   return (
@@ -111,6 +123,8 @@ export default function Users() {
               onDelete={handleDelete}
               onEdit={handleEdit}
               onView={handleView}
+              sortOrder={sortOrder}
+              onToggleSort={handleToggleSort}
             />
           </div>
           <div className="bg-gray-50/30 shrink-0">

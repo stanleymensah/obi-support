@@ -1,13 +1,7 @@
 import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { db } from "../lib/firebase";
-import {
-  collection,
-  query,
-  where,
-  orderBy,
-  onSnapshot,
-} from "firebase/firestore";
+import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
 import { useAuth } from "@/context/AuthContext";
 
 export function useTickets() {
@@ -17,26 +11,33 @@ export function useTickets() {
   useEffect(() => {
     if (!user?.uid) return undefined;
 
-    const ticketsRef = collection(db, "tickets");
-    const q =
-      profile
-        ? query(ticketsRef, orderBy("createdAt", "desc"))
-        : query(
-            ticketsRef,
-            where("userId", "==", user.uid),
-            orderBy("createdAt", "desc"),
-          );
+    let mounted = true;
 
-    const unsub = onSnapshot(q, (snapshot) => {
-      const tickets = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+    const cacheKey = ["tickets", user.uid];
+    const cached = queryClient.getQueryData(cacheKey);
+    if (cached) return;
 
-      queryClient.setQueryData(["tickets", user.uid], tickets);
-    });
+    (async () => {
+      const ticketsRef = collection(db, "tickets");
+      const q =
+        profile
+          ? query(ticketsRef, orderBy("createdAt", "asc"))
+          : query(
+              ticketsRef,
+              where("userId", "==", user.uid),
+              orderBy("createdAt", "asc"),
+            );
 
-    return () => unsub();
+      const snapshot = await getDocs(q);
+      if (!mounted) return;
+      const tickets = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      queryClient.setQueryData(cacheKey, tickets);
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile?.role, queryClient, user?.uid]);
 
   return useQuery({
@@ -47,5 +48,8 @@ export function useTickets() {
 
     enabled: !!user?.uid,
     staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
   });
 }

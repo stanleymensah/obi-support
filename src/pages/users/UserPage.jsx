@@ -7,14 +7,14 @@ export default function UserPage() {
 
   return (
     <>
-      <div className="tickets border h-full rounded-md bg-white flex flex-col gap-4">
+      <div className="tickets border h-full rounded-md bg-white flex flex-col gap-2">
         <div className="top flex items-center justify-between py-2 px-4 text-white bg-azure-pop rounded-t-sm">
           <h4>Profile</h4>
         </div>
 
         <div className="body px-4 flex flex-col gap-5">
           <div className="details flex items-center w-full gap-4">
-            <div className="w-24">
+            <div className="w-14">
               <img
                 src="/images/pfp.jpg"
                 alt=""
@@ -23,15 +23,15 @@ export default function UserPage() {
             </div>
             <div className="names flex flex-col">
               <div className="flex items-center gap-2">
-                <h3>
+                <h4>
                   {profile
                     ? `${profile?.firstName} ${profile?.lastName}`
                     : "Guest"}
-                </h3> {"-"}
-                <span className="capitalize bg-azure-pop text-white text-xs px-1 py-0.5 text-center rounded-full"> {profile ? `${profile?.role}` : "User"}</span>
+                </h4> {"-"}
+                <span className="uppercase bg-azure-pop text-white text-[10px] px-1 py-0.5 text-center rounded-full"> {profile ? `${profile?.role}` : "User"}</span>
               </div>
-              <span>{profile ? `${profile?.email}` : "Null"}</span>
-              <span>
+              <span className="text-[11px]">{profile ? `${profile?.email}` : "Null"}</span>
+              <span className="text-[11px]">
                 Joined:{formatDate(profile?.createdAt)}
               </span>
             </div>

@@ -11,6 +11,8 @@ import { Search } from "lucide-react";
 import { useDebounce } from "@/hooks/useDebounce";
 import TicketComments from "./Comments";
 import { useAuth } from "@/context/AuthContext";
+import { useMemo } from "react";
+import { sortByCreatedAt } from "@/lib/utils";
 
 export default function Tickets() {
   const { data: tickets, isLoading, error } = useTickets();
@@ -26,10 +28,15 @@ export default function Tickets() {
   const [isComment, setIsComment] = useState(false);
   const [commentTicket, setCommentTicket] = useState(null);
   const { profile } = useAuth();
+  const [sortOrder, setSortOrder] = useState("asc");
 
   const debouncedSearch = useDebounce(searchTerm);
 
-  const filteredTickets = (tickets || []).filter((ticket) => {
+  const sortedTickets = useMemo(() => {
+    return sortByCreatedAt(tickets || [], sortOrder);
+  }, [tickets, sortOrder]);
+
+  const filteredTickets = sortedTickets.filter((ticket) => {
     const query = debouncedSearch.toLowerCase();
     return (
       ticket.title?.toLowerCase().includes(query) ||
@@ -86,6 +93,10 @@ export default function Tickets() {
     setTicketToDelete(null);
   };
 
+  const handleToggleSort = () => {
+    setSortOrder((current) => (current === "asc" ? "desc" : "asc"));
+  };
+
   if (isLoading) return <div>Loading tickets...</div>;
 
   return (
@@ -129,6 +140,8 @@ export default function Tickets() {
             onView={handleView}
             onComment={handleComment}
             profile={profile}
+            sortOrder={sortOrder}
+            onToggleSort={handleToggleSort}
           />
         </div>
 

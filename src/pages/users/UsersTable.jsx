@@ -7,14 +7,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Trash2, UserRoundPen } from "lucide-react";
+import { ArrowDown, ArrowUp, Trash2, UserRoundPen } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
-export default function UsersTable({ users, onDelete, onEdit, onView }) {
-
+export default function UsersTable({
+  users,
+  onDelete,
+  onEdit,
+  onView,
+  sortOrder,
+  onToggleSort,
+}) {
   return (
     <>
-     <Table>
+      <Table>
         {/* <TableCaption>A list of all users.</TableCaption>{" "} */}
         {users.length === 0 && (
           <TableCaption className="w-full flex items-center justify-center">
@@ -23,12 +29,25 @@ export default function UsersTable({ users, onDelete, onEdit, onView }) {
         )}
         <TableHeader>
           <TableRow>
-           <TableHead className="w-20">ID</TableHead>
-          <TableHead>User</TableHead>
-          <TableHead>Email</TableHead>
-          <TableHead>Role</TableHead>
-          <TableHead className="text-right">Joined</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
+            <TableHead className="w-20">ID</TableHead>
+            <TableHead>User</TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Role</TableHead>
+            <TableHead className="text-right">
+              <button
+                type="button"
+                onClick={onToggleSort}
+                className="inline-flex items-center gap-1 text-right font-medium hover:text-azure-pop"
+              >
+                <span className="text-xs">Joined</span>
+                {sortOrder === "asc" ? (
+                  <ArrowUp size={14} />
+                ) : (
+                  <ArrowDown size={14} />
+                )}
+              </button>
+            </TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -39,14 +58,19 @@ export default function UsersTable({ users, onDelete, onEdit, onView }) {
                 onView(user);
               }}
             >
-              <TableCell className="font-medium py-2">U-{user.id.slice(0, 5)}
+              <TableCell className="font-medium py-2">
+                U-{user.id.slice(0, 5)}
               </TableCell>
-              <TableCell className="py-2">{user.firstName} {user.lastName}</TableCell>
+              <TableCell className="py-2">
+                {user.firstName} {user.lastName}
+              </TableCell>
               <TableCell className="py-2">{user.email}</TableCell>
               <TableCell className="py-2">{user.role}</TableCell>
-              <TableCell className="text-right py-2">{formatDate(user.createdAt)}</TableCell>
+              <TableCell className="text-right py-2">
+                {formatDate(user.createdAt)}
+              </TableCell>
               <TableCell className="text-right py-2 flex items-center justify-end gap-1 space-x-2">
-                  <button
+                <button
                   className="text-blue-500"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -64,12 +88,11 @@ export default function UsersTable({ users, onDelete, onEdit, onView }) {
                 >
                   <Trash2 size={16} />
                 </button>
-                
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
     </>
-  )
+  );
 }

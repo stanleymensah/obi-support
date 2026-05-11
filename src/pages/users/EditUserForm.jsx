@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { db } from "@/lib/firebase";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, collection, getDocs, query, orderBy } from "firebase/firestore";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function EditUserForm({ onClose, userToEdit }) {
@@ -26,8 +26,17 @@ export default function EditUserForm({ onClose, userToEdit }) {
       return await updateDoc(userRef, updatedData);
     },
     onSuccess: () => {
-      // Invalidate the users query to refresh the table
-      queryClient.invalidateQueries({ queryKey: ["users"] });
+      (async () => {
+        try {
+          const usersRef = collection(db, "users");
+          const q = query(usersRef, orderBy("createdAt", "desc"));
+          const snapshot = await getDocs(q);
+          const users = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+          queryClient.setQueryData(["users"], users);
+        } catch (e) {
+          queryClient.invalidateQueries({ queryKey: ["users"] });
+        }
+      })();
       if (onClose) onClose();
     },
   });

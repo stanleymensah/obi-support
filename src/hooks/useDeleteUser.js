@@ -9,8 +9,13 @@ export function useDeleteUser(){
         mutationFn: async (userId) => {
             await deleteDoc(doc(db, 'users', userId));
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['users']})
+        onSuccess: (_data, userId) => {
+            const users = queryClient.getQueryData(['users']);
+            if (users) {
+                queryClient.setQueryData(['users'], users.filter(u => u.id !== userId));
+            } else {
+                queryClient.invalidateQueries({queryKey: ['users']});
+            }
         },
         onError: (err) => alert("Failed to delete: " + err.message)
     })

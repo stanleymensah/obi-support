@@ -7,10 +7,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { SquarePen, Trash2, MessageCircleMore } from "lucide-react";
+import { ArrowDown, ArrowUp, SquarePen, Trash2, MessageCircleMore } from "lucide-react";
 import { formatRelativeTime } from "@/lib/utils";
 
-export default function TicketsTable({ tickets,onComment, onDelete, onEdit, onView, profile }) {
+export default function TicketsTable({
+  tickets,
+  onComment,
+  onDelete,
+  onEdit,
+  onView,
+  profile,
+  sortOrder,
+  onToggleSort,
+}) {
   const getDisplayNumber = (ticket) => {
     if (ticket.ticketNumber) return ticket.ticketNumber;
     if (ticket.id) {
@@ -39,7 +48,16 @@ export default function TicketsTable({ tickets,onComment, onDelete, onEdit, onVi
           <TableRow>
             <TableHead className="w-20">ID</TableHead>
             <TableHead className="min-w-50">Title</TableHead>
-            <TableHead className="w-30">Created</TableHead>
+            <TableHead className="w-30">
+              <button
+                type="button"
+                onClick={onToggleSort}
+                className="inline-flex items-center gap-1 text-left font-medium hover:text-azure-pop"
+              >
+                <span className="text-xs">Created</span>
+                {sortOrder === "asc" ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
+              </button>
+            </TableHead>
             <TableHead className="w-30">Priority</TableHead>
             <TableHead className="w-25 text-right">Status</TableHead>
             <TableHead className="w-37.5 text-right">Actions</TableHead>

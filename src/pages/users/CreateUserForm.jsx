@@ -1,7 +1,9 @@
 import { useForm } from "react-hook-form";
 import { db } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, doc, getDocs, query, orderBy, serverTimestamp, setDoc, where } from "firebase/firestore";
+import { fetchSignInMethodsForEmail } from "firebase/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { auth } from "@/lib/firebase";
 
 export default function CreateUserForm({ onClose }) {
   const queryClient = useQueryClient();
@@ -9,6 +11,7 @@ export default function CreateUserForm({ onClose }) {
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
     reset,
   } = useForm({
@@ -17,27 +20,75 @@ export default function CreateUserForm({ onClose }) {
       lastName: "",
       email: "",
       role: "user",
+      password: "",
+      confirmPassword: "",
     },
   });
 
   const mutation = useMutation({
     mutationFn: async (newUser) => {
-      // We use addDoc if we don't have a UID yet, 
-      // or setDoc if you are linking to an Auth account.
-      return await addDoc(collection(db, "users"), {
-        ...newUser,
+      const existingProfileQuery = query(
+        collection(db, "users"),
+        where("email", "==", newUser.email),
+      );
+      const existingProfileSnapshot = await getDocs(existingProfileQuery);
+
+      if (!existingProfileSnapshot.empty) {
+        throw new Error("A user with this email already exists.");
+      }
+
+      const signInMethods = await fetchSignInMethodsForEmail(auth, newUser.email);
+      if (signInMethods.length > 0) {
+        throw new Error("A user with this email already exists.");
+      }
+
+      const apiKey = auth.app.options.apiKey;
+      const response = await fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: newUser.email,
+            password: newUser.password,
+            returnSecureToken: true,
+          }),
+        },
+      );
+
+      const authData = await response.json();
+
+      if (!response.ok) {
+        throw new Error(authData?.error?.message || "Failed to create user account.");
+      }
+
+      await setDoc(doc(db, "users", authData.localId), {
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        email: newUser.email,
+        role: newUser.role,
         createdAt: serverTimestamp(),
         photoURL: "", // Initialize empty profile pic
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
+      (async () => {
+        try {
+          const usersRef = collection(db, "users");
+          const q = query(usersRef, orderBy("createdAt", "desc"));
+          const snapshot = await getDocs(q);
+          const users = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+          queryClient.setQueryData(["users"], users);
+        } catch {
+          queryClient.invalidateQueries({ queryKey: ["users"] });
+        }
+      })();
       reset();
       if (onClose) onClose();
     },
     onError: (error) => {
       console.error("Error adding user:", error);
-      alert("Failed to create user profile.");
+      alert(error.message || "Failed to create user profile.");
     },
   });
 
@@ -91,6 +142,40 @@ export default function CreateUserForm({ onClose }) {
           />
         </div>
         {errors.email && <p className="text-rose-pop text-[10px]">{errors.email.message}</p>}
+      </div>
+
+      {/* Password Field */}
+      <div className="flex flex-col gap-1">
+        <label className="text-xs font-medium text-gray-600">Password</label>
+        <div className="border py-1.5 px-3 rounded-sm">
+          <input
+            {...register("password", {
+              required: "Password required",
+              minLength: { value: 8, message: "Password must be at least 8 characters" },
+            })}
+            type="password"
+            placeholder="Create a password"
+            className="text-xs w-full bg-transparent outline-none"
+          />
+        </div>
+        {errors.password && <p className="text-rose-pop text-[10px]">{errors.password.message}</p>}
+      </div>
+
+      {/* Confirm Password Field */}
+      <div className="flex flex-col gap-1">
+        <label className="text-xs font-medium text-gray-600">Confirm Password</label>
+        <div className="border py-1.5 px-3 rounded-sm">
+          <input
+            {...register("confirmPassword", {
+              required: "Please confirm the password",
+              validate: (value) => value === getValues("password") || "Passwords do not match",
+            })}
+            type="password"
+            placeholder="Confirm the password"
+            className="text-xs w-full bg-transparent outline-none"
+          />
+        </div>
+        {errors.confirmPassword && <p className="text-rose-pop text-[10px]">{errors.confirmPassword.message}</p>}
       </div>
 
       {/* Role Selection */}
