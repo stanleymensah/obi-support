@@ -17,17 +17,22 @@ import Spinner from "@/components/ui/spinner";
 import usePagination from "@/hooks/usePagination";
 import { useTicketFilters } from "@/hooks/useTicketFilters";
 import Pagination from "@/components/common/Pagination";
+import { useUsers } from "@/hooks/useUsers";
+import { useUpdateTicket } from "@/hooks/useUpdateTicket";
 
 export default function Tickets() {
   const { data: tickets, isLoading, error } = useTickets();
+  const { data: users } = useUsers();
   const [isCreating, setIsCreating] = useState(false);
   const deleteMutation = useDeleteTicket();
+  const updateTicketMutation = useUpdateTicket();
   const [isDeleting, setIsDeleting] = useState(false);
   const [ticketToDelete, setTicketToDelete] = useState(null);
   const [ticketToEdit, setTicketToEdit] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isViewing, setIsViewing] = useState(false);
   const [ticketToView, setTicketToView] = useState(null);
+  const [workflowAssignee, setWorkflowAssignee] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [isComment, setIsComment] = useState(false);
   const [commentTicket, setCommentTicket] = useState(null);
@@ -64,12 +69,14 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
 
   const handleView = (ticket) => {
     setTicketToView(ticket);
+    setWorkflowAssignee(ticket.assignee || "");
     setIsViewing(true);
   };
 
   const handleCloseView = () => {
     setTicketToView(null);
     setIsViewing(false);
+    setWorkflowAssignee("");
   };
 
   const handleDelete = (ticketId) => {
@@ -103,6 +110,43 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
 
   const handleToggleSort = () => {
     setSortOrder((current) => (current === "asc" ? "desc" : "asc"));
+  };
+
+  const commitWorkflowUpdate = async (updates) => {
+    if (!ticketToView?.id) return;
+
+    await updateTicketMutation.mutateAsync({
+      ticketId: ticketToView.id,
+      updates,
+    });
+
+    setTicketToView((current) => (current ? { ...current, ...updates } : current));
+    if (Object.prototype.hasOwnProperty.call(updates, "assignee")) {
+      setWorkflowAssignee(updates.assignee || "");
+    }
+  };
+
+  const handleAssignAssignee = async () => {
+    await commitWorkflowUpdate({
+      assignee: workflowAssignee,
+      status: "Assigned",
+    });
+  };
+
+  const handleStartWork = async () => {
+    await commitWorkflowUpdate({ status: "In Progress" });
+  };
+
+  const handleMarkResolved = async () => {
+    await commitWorkflowUpdate({ status: "Resolved" });
+  };
+
+  const handleCloseTicket = async () => {
+    await commitWorkflowUpdate({ status: "Closed" });
+  };
+
+  const handleReopenTicket = async () => {
+    await commitWorkflowUpdate({ status: "Reopened" });
   };
 
   if (isLoading)
@@ -139,7 +183,7 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
               >
                 <option value="all">All Status</option>
                 <option value="Open">Open</option>
-                <option value="In-Progress">In Progress</option>
+                <option value="In Progress">In Progress</option>
                 {/* etc... */}
               </select>
 
@@ -218,7 +262,18 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
 
       {isViewing && (
         <Modal size="sm" title={ticketToView.title} onClose={handleCloseView}>
-          <TicketDetails ticket={ticketToView} />
+          <TicketDetails
+            ticket={ticketToView}
+            users={users || []}
+            effectiveAssignee={workflowAssignee}
+            canManageTickets={profile?.role === "admin"}
+            onAssigneeChange={setWorkflowAssignee}
+            onAssign={handleAssignAssignee}
+            onStartWork={handleStartWork}
+            onMarkResolved={handleMarkResolved}
+            onCloseTicket={handleCloseTicket}
+            onReopenTicket={handleReopenTicket}
+          />
         </Modal>
       )}
 

@@ -1,6 +1,37 @@
+import TicketWorkflowActions from "@/components/tickets/TicketWorkflowActions";
 import { formatDate } from "@/lib/utils";
 
-export default function TicketDetails({ ticket }) {
+const normalizeStatus = (status) =>
+  String(status ?? "closed").trim().toLowerCase().replace(/\s+/g, "-");
+
+const formatStatusLabel = (status) => {
+  const normalized = String(status ?? "closed")
+    .trim()
+    .replace(/[-_]+/g, " ");
+
+  return normalized
+    ? normalized
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(" ")
+    : "Closed";
+};
+
+export default function TicketDetails({
+  ticket,
+  users,
+  effectiveAssignee,
+  canManageTickets = true,
+  onAssigneeChange,
+  onAssign,
+  onStartWork,
+  onMarkResolved,
+  onCloseTicket,
+  onReopenTicket,
+}) {
+  const status = normalizeStatus(ticket.status);
+
   return (
     <div className="flex flex-col gap-3 p-1">
       {/* Description Section */}
@@ -20,6 +51,12 @@ export default function TicketDetails({ ticket }) {
         <span className="text-gray-600 text-xs">{ticket.email}</span>
          
       </div>
+      <div className="flex flex-col gap-1">
+          <h4 className="text-xs font-medium tracking-wider ">Assignee</h4>
+          <span className="text-xs font-medium text-gray-600 truncate">
+            {ticket.assignee || "Unassigned"}
+          </span>
+        </div>
          <div className="flex flex-col gap-1">
         <h4 className="text-xs font-medium  tracking-wider ">
           Created:
@@ -37,11 +74,14 @@ export default function TicketDetails({ ticket }) {
         <div className="col-span-1 flex flex-col gap-1.5">
           <h4 className="text-xs font-medium  ">Status</h4>
           <span className={`w-fit px-3 py-1 rounded-full text-[11px] font-medium border ${
-            ticket.status === 'Open' ? 'bg-green-50 text-green-600 border-green-100' : 
-            ticket.status === 'In Progress' ? 'bg-blue-50 text-blue-600 border-blue-100' : 
+            status === 'open' ? 'bg-green-50 text-green-600 border-green-100' : 
+            status === 'assigned' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 
+            status === 'reopened' ? 'bg-violet-50 text-violet-600 border-violet-100' : 
+            status === 'in-progress' ? 'bg-blue-50 text-blue-600 border-blue-100' : 
+            status === 'resolved' ? 'bg-amber-50 text-amber-600 border-amber-100' : 
             'bg-gray-100 text-gray-500 border-gray-200'
           }`}>
-            {ticket.status}
+            {formatStatusLabel(ticket.status)}
           </span>
         </div>
 
@@ -63,6 +103,19 @@ export default function TicketDetails({ ticket }) {
           </span>
         </div>
       </div>
+
+      <TicketWorkflowActions
+        ticket={ticket}
+        users={users}
+        effectiveAssignee={effectiveAssignee}
+        canManageTickets={canManageTickets}
+        onAssigneeChange={onAssigneeChange}
+        onAssign={onAssign}
+        onStartWork={onStartWork}
+        onMarkResolved={onMarkResolved}
+        onCloseTicket={onCloseTicket}
+        onReopenTicket={onReopenTicket}
+      />
     </div>
   );
 }
