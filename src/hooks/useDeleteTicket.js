@@ -1,6 +1,7 @@
 import { doc, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export function useDeleteTicket(){
     const queryClient = useQueryClient();
@@ -20,8 +21,15 @@ export function useDeleteTicket(){
             } else {
                 queryClient.invalidateQueries({queryKey: ['tickets']});
             }
+            toast.success("Ticket deleted successfully.", {
+                className: "bg-azure-pop text-white border-azure-pop",
+            });
         },
-        onError: (err) => alert("Failed to delete: " + err.message)
+        onError: (err) => {
+            toast.error(err.message || "Failed to delete ticket.", {
+                className: "bg-white text-rose-600 border-rose-200",
+            });
+        }
     })
 }
 

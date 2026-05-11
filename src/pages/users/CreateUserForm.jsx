@@ -5,6 +5,7 @@ import { fetchSignInMethodsForEmail } from "firebase/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { auth } from "@/lib/firebase";
 import Spinner from "@/components/ui/spinner";
+import { toast } from "sonner";
 
 export default function CreateUserForm({ onClose }) {
   const queryClient = useQueryClient();
@@ -84,12 +85,17 @@ export default function CreateUserForm({ onClose }) {
           queryClient.invalidateQueries({ queryKey: ["users"] });
         }
       })();
+      toast.success("User created successfully.", {
+        className: "bg-azure-pop text-white border-azure-pop",
+      });
       reset();
       if (onClose) onClose();
     },
     onError: (error) => {
       console.error("Error adding user:", error);
-      alert(error.message || "Failed to create user profile.");
+      toast.error(error.message || "Failed to create user profile.", {
+        className: "bg-white text-rose-600 border-rose-200",
+      });
     },
   });
 

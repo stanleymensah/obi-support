@@ -15,6 +15,21 @@ import {
   MessageCircleMore,
 } from "lucide-react";
 import { formatRelativeTime } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+
+const statusColors = {
+  open: "bg-blue-100 text-blue-700 border-blue-200",
+  "in-progress": "bg-yellow-100 text-yellow-700 border-yellow-200",
+  resolved: "bg-green-100 text-green-700 border-green-200",
+  closed: "bg-gray-100 text-gray-700 border-gray-100",
+};
+
+const priorityVariants = {
+  low: "secondary", // Muted gray/neutral
+  medium: "default", // Primary brand color
+  high: "outline", // Border only (subtle but distinct)
+  urgent: "destructive", // Red (high attention)
+};
 
 export default function TicketsTable({
   tickets,
@@ -44,9 +59,7 @@ export default function TicketsTable({
   return (
     <>
       <Table>
-        {tickets.length === 0 && (
-          <TableCaption>No tickets found!</TableCaption>
-        )}
+        {tickets.length === 0 && <TableCaption>No tickets found!</TableCaption>}
         <TableHeader>
           <TableRow>
             <TableHead className="w-20">ID</TableHead>
@@ -85,8 +98,26 @@ export default function TicketsTable({
               <TableCell className="py-2">
                 {formatRelativeTime(ticket.createdAt)}
               </TableCell>
-              <TableCell className="py-2">{ticket.priority}</TableCell>
-              <TableCell className="text-right py-2">{ticket.status}</TableCell>
+              <TableCell className="py-2">
+                {" "}
+                <Badge
+                  variant={
+                    priorityVariants[ticket.priority?.toLowerCase()] ||
+                    "outline"
+                  }
+                  className="capitalize"
+                >
+                  {ticket.priority}
+                </Badge>
+              </TableCell>
+              <TableCell className="text-right py-2">
+                <Badge
+                  className={`${statusColors[ticket.status?.toLowerCase()] || "bg-gray-100"} capitalize font-medium`}
+                  variant="outline"
+                >
+                  {ticket.status}
+                </Badge>
+              </TableCell>
               <TableCell className="text-right py-2 flex items-center justify-end gap-1 space-x-2">
                 <button
                   className="text-gray-600"

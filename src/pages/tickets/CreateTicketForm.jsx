@@ -4,6 +4,7 @@ import { collection, addDoc, serverTimestamp, getDocs, query, where, orderBy } f
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/context/AuthContext";
 import Spinner from "@/components/ui/spinner";
+import { toast } from "sonner";
 
 export default function CreateTicketForm({ onClose }) {
   const { user, profile } = useAuth();
@@ -58,12 +59,17 @@ export default function CreateTicketForm({ onClose }) {
           queryClient.invalidateQueries({ queryKey: ["tickets", user?.uid] });
         }
       })();
+      toast.success("Ticket created successfully.", {
+        className: "bg-azure-pop text-white border-azure-pop",
+      });
       reset();
       if (onClose) onClose();
     },
     onError: (error) => {
       console.error("Error adding ticket:", error);
-      alert("Failed to create ticket. Check console for details.");
+      toast.error(error.message || "Failed to create ticket.", {
+        className: "bg-white text-rose-600 border-rose-200",
+      });
     },
   });
 

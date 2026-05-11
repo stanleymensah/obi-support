@@ -14,6 +14,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useMemo } from "react";
 import { sortByCreatedAt } from "@/lib/utils";
 import Spinner from "@/components/ui/spinner";
+import { useTicketFilters } from "@/hooks/useTicketFilters";
 
 export default function Tickets() {
   const { data: tickets, isLoading, error } = useTickets();
@@ -26,11 +27,13 @@ export default function Tickets() {
   const [isViewing, setIsViewing] = useState(false);
   const [ticketToView, setTicketToView] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  
   const [isComment, setIsComment] = useState(false);
   const [commentTicket, setCommentTicket] = useState(null);
   const { profile } = useAuth();
   const [sortOrder, setSortOrder] = useState("asc");
+  const [confirmText, setConfirmText] = useState("");
+const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
+
 
   const debouncedSearch = useDebounce(searchTerm);
 
@@ -38,14 +41,13 @@ export default function Tickets() {
     return sortByCreatedAt(tickets || [], sortOrder);
   }, [tickets, sortOrder]);
 
-  const filteredTickets = sortedTickets.filter((ticket) => {
-    const query = debouncedSearch.toLowerCase();
-    return (
-      ticket.title?.toLowerCase().includes(query) ||
-      ticket.description?.toLowerCase().includes(query) ||
-      ticket.email?.toLowerCase().includes(query)
-    );
-  });
+  const {
+    statusFilter,
+    setStatusFilter,
+    priorityFilter,
+    setPriorityFilter,
+    filteredTickets,
+  } = useTicketFilters(tickets, sortedTickets, debouncedSearch);
 
   const handleComment = (ticket) => {
     setCommentTicket(ticket);
@@ -93,13 +95,19 @@ export default function Tickets() {
   const handleCancelDelete = () => {
     setIsDeleting(false);
     setTicketToDelete(null);
+    setConfirmText("");
   };
 
   const handleToggleSort = () => {
     setSortOrder((current) => (current === "asc" ? "desc" : "asc"));
   };
 
-  if (isLoading) return <div className="w-full flex items-center justify-center">Loading tickets <Spinner /></div>;
+  if (isLoading)
+    return (
+      <div className="w-full flex items-center justify-center">
+        Loading tickets <Spinner />
+      </div>
+    );
 
   return (
     <>
@@ -119,19 +127,44 @@ export default function Tickets() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <div className="flex items-center gap-2">
-              {profile?.role ? (
-                <div className="create-new">
-                  <button
-                    className="create text-sm bg-azure-pop text-white px-3 py-1 rounded-xs"
-                    onClick={() => setIsCreating(true)}
-                  >
-                    Create
-                  </button>
-                </div>
-              ) : (
-                ""
-              )}
+            <div className="flex items-center gap-2 ">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="text-xs border py-1 px-2 rounded-sm bg-white"
+              >
+                <option value="all">All Status</option>
+                <option value="Open">Open</option>
+                <option value="In-Progress">In Progress</option>
+                {/* etc... */}
+              </select>
+
+              <select
+                value={priorityFilter}
+                onChange={(e) => setPriorityFilter(e.target.value)}
+                className="text-xs border py-1 px-2 rounded-sm bg-white"
+              >
+                <option value="all">All Priority</option>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+                {/* etc... */}
+              </select>
+
+              <div className="flex items-center gap-2">
+                {profile?.role ? (
+                  <div className="create-new">
+                    <button
+                      className="create text-sm bg-azure-pop text-white px-3 py-1 rounded-xs"
+                      onClick={() => setIsCreating(true)}
+                    >
+                      Create
+                    </button>
+                  </div>
+                ) : (
+                  ""
+                )}
+              </div>
             </div>
           </div>
 
@@ -182,13 +215,14 @@ export default function Tickets() {
 
       {isDeleting && (
         <ConfirmModal
-          title="Confirm Delete"
-          message="Are you sure you want to delete this ticket? "
+          title="Delete Ticket"
+          message="This will permanently delete this ticket and all associated comments."
+          confirmId={ticketToDelete} // This triggers the "Type to confirm" logic
           onApprove={handleConfirmDelete}
-          approve="Delete"
           onCancel={handleCancelDelete}
           onClose={handleCancelDelete}
-          confirmId={ticketToDelete}
+          approve="Delete Permanently"
+          disabled={confirmText !== targetTicket?.title}
         />
       )}
     </>
