@@ -14,7 +14,9 @@ import { useAuth } from "@/context/AuthContext";
 import { useMemo } from "react";
 import { sortByCreatedAt } from "@/lib/utils";
 import Spinner from "@/components/ui/spinner";
+import usePagination from "@/hooks/usePagination";
 import { useTicketFilters } from "@/hooks/useTicketFilters";
+import Pagination from "@/components/common/Pagination";
 
 export default function Tickets() {
   const { data: tickets, isLoading, error } = useTickets();
@@ -48,6 +50,7 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
     setPriorityFilter,
     filteredTickets,
   } = useTicketFilters(tickets, sortedTickets, debouncedSearch);
+  const pagination = usePagination(filteredTickets, 8);
 
   const handleComment = (ticket) => {
     setCommentTicket(ticket);
@@ -108,16 +111,17 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
         Loading tickets <Spinner />
       </div>
     );
+    
 
   return (
     <>
-      <div className="tickets border h-full rounded-md bg-white flex flex-col gap-4">
-        <div className="top flex items-center justify-between py-2 px-4 text-white bg-azure-pop rounded-t-sm">
+      <div className="tickets border h-full rounded-md bg-white flex flex-col overflow-hidden">
+        <div className="top flex items-center justify-between py-2 px-4 text-white bg-azure-pop shrink-0">
           <h4>Support</h4>
         </div>
 
-        <div className="w-full px-4 flex flex-col gap-2">
-          <div className="w-full flex items-center justify-between text-gray-600">
+        <div className="w-full px-4 flex flex-col flex-1 min-h-0">
+          <div className="w-full flex items-center justify-between text-gray-600 py-4 shrink-0">
             <div className="search border py-1.5 px-3 rounded-sm flex items-center gap-1 w-1/2">
               <Search size={14} />
               <input
@@ -168,16 +172,21 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
             </div>
           </div>
 
-          <TicketsTable
-            tickets={filteredTickets}
-            onDelete={handleDelete}
-            onEdit={handleEdit}
-            onView={handleView}
-            onComment={handleComment}
-            profile={profile}
-            sortOrder={sortOrder}
-            onToggleSort={handleToggleSort}
-          />
+          <div className="flex-1 overflow-auto min-h-0">
+            <TicketsTable
+              tickets={pagination.currentItems}
+              onDelete={handleDelete}
+              onEdit={handleEdit}
+              onView={handleView}
+              onComment={handleComment}
+              profile={profile}
+              sortOrder={sortOrder}
+              onToggleSort={handleToggleSort}
+            />
+          </div>
+          <div className="bg-gray-50/30 shrink-0">
+            <Pagination pagination={pagination} />
+          </div>
         </div>
 
         {error && (
@@ -196,7 +205,7 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
       )}
 
       {isComment && (
-        <Modal size="sm" title="Comment" onClose={handleCloseComment}>
+        <Modal size="md" title="Comment" onClose={handleCloseComment}>
           <TicketComments ticketId={commentTicket.id} profile={profile} />
         </Modal>
       )}

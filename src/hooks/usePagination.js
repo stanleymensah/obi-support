@@ -1,16 +1,15 @@
-// hooks/usePagination.js
 import { useState, useMemo, useEffect } from "react";
 
 export default function usePagination(items, itemsPerPage = 10) {
   const [currentPage, setCurrentPage] = useState(1);
-
-  // ⚠️ IMPORTANT: Reset to page 1 if the search results change
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentPage(1);
   }, [items.length]);
 
   const totalPages = Math.ceil(items.length / itemsPerPage) || 1;
+  const goToFirstPage = () => setCurrentPage(1);
+const goToLastPage = () => setCurrentPage(totalPages);
 
   const currentItems = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -37,6 +36,8 @@ export default function usePagination(items, itemsPerPage = 10) {
     nextPage,
     prevPage,
     goToPage,
+      goToFirstPage,
+  goToLastPage,
     hasNextPage: currentPage < totalPages,
     hasPrevPage: currentPage > 1,
   };

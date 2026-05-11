@@ -4,7 +4,7 @@ export default function Modal({ children, onClose, title, size }) {
 
   const sizeClassMap = {
     sm: "sm:max-w-120",
-    md: "sm:max-w-xl",
+    md: "sm:max-w-xl md:w-92",
     lg: "sm:max-w-3xl",
     xl: "sm:max-w-5xl",
     full: "sm:max-w-[90vw]",

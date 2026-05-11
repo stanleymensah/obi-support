@@ -108,7 +108,7 @@ export default function Users() {
               <Search size={14} />
               <input
                 type="text"
-                placeholder="Search by title, description, email..."
+                placeholder="Search by name, email..."
                 className="text-xs w-full"
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
