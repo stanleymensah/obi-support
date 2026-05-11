@@ -13,6 +13,7 @@ import TicketComments from "./Comments";
 import { useAuth } from "@/context/AuthContext";
 import { useMemo } from "react";
 import { sortByCreatedAt } from "@/lib/utils";
+import Spinner from "@/components/ui/spinner";
 
 export default function Tickets() {
   const { data: tickets, isLoading, error } = useTickets();
@@ -25,6 +26,7 @@ export default function Tickets() {
   const [isViewing, setIsViewing] = useState(false);
   const [ticketToView, setTicketToView] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  
   const [isComment, setIsComment] = useState(false);
   const [commentTicket, setCommentTicket] = useState(null);
   const { profile } = useAuth();
@@ -97,7 +99,7 @@ export default function Tickets() {
     setSortOrder((current) => (current === "asc" ? "desc" : "asc"));
   };
 
-  if (isLoading) return <div>Loading tickets...</div>;
+  if (isLoading) return <div className="w-full flex items-center justify-center">Loading tickets <Spinner /></div>;
 
   return (
     <>
@@ -117,8 +119,8 @@ export default function Tickets() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            {profile?.role === "admin" ? (
-              <>
+            <div className="flex items-center gap-2">
+              {profile?.role ? (
                 <div className="create-new">
                   <button
                     className="create text-sm bg-azure-pop text-white px-3 py-1 rounded-xs"
@@ -127,10 +129,10 @@ export default function Tickets() {
                     Create
                   </button>
                 </div>
-              </>
-            ) : (
-              ""
-            )}
+              ) : (
+                ""
+              )}
+            </div>
           </div>
 
           <TicketsTable
@@ -186,6 +188,7 @@ export default function Tickets() {
           approve="Delete"
           onCancel={handleCancelDelete}
           onClose={handleCancelDelete}
+          confirmId={ticketToDelete}
         />
       )}
     </>

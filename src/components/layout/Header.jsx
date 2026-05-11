@@ -1,4 +1,5 @@
 import { useAuth } from "@/context/AuthContext";
+import { ChevronDown } from "lucide-react";
 
 export default function Header({ showDropdown }) {
   // eslint-disable-next-line no-unused-vars
@@ -19,7 +20,7 @@ export default function Header({ showDropdown }) {
             <p className="font-medium text-xs">
               {profile ? `${profile.firstName} ${profile.lastName}` : "Guest"}
             </p>
-            <span className="text-xs -mt-1">@{profile?.role || "user"}</span>
+            <span className="text-xs -mt-1 inline-flex items-center gap-1">@{profile?.role || "user"} <ChevronDown size={14} /> </span>
           </div>
         </div>
       </header>

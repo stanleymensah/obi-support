@@ -7,7 +7,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowDown, ArrowUp, SquarePen, Trash2, MessageCircleMore } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  SquarePen,
+  Trash2,
+  MessageCircleMore,
+} from "lucide-react";
 import { formatRelativeTime } from "@/lib/utils";
 
 export default function TicketsTable({
@@ -38,11 +44,8 @@ export default function TicketsTable({
   return (
     <>
       <Table>
-        <TableCaption>A list of all your tickets.</TableCaption>{" "}
         {tickets.length === 0 && (
-          <TableCaption className="w-full flex items-center justify-center">
-            <p>No tickets</p>
-          </TableCaption>
+          <TableCaption>No tickets found!</TableCaption>
         )}
         <TableHeader>
           <TableRow>
@@ -55,7 +58,11 @@ export default function TicketsTable({
                 className="inline-flex items-center gap-1 text-left font-medium hover:text-azure-pop"
               >
                 <span className="text-xs">Created</span>
-                {sortOrder === "asc" ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
+                {sortOrder === "asc" ? (
+                  <ArrowUp size={14} />
+                ) : (
+                  <ArrowDown size={14} />
+                )}
               </button>
             </TableHead>
             <TableHead className="w-30">Priority</TableHead>
@@ -75,39 +82,45 @@ export default function TicketsTable({
                 T-{getDisplayNumber(ticket)}
               </TableCell>
               <TableCell className="py-2">{ticket.title}</TableCell>
-              <TableCell className="py-2">{formatRelativeTime(ticket.createdAt)}</TableCell>
+              <TableCell className="py-2">
+                {formatRelativeTime(ticket.createdAt)}
+              </TableCell>
               <TableCell className="py-2">{ticket.priority}</TableCell>
               <TableCell className="text-right py-2">{ticket.status}</TableCell>
               <TableCell className="text-right py-2 flex items-center justify-end gap-1 space-x-2">
-                <button className="text-gray-600"  onClick={(e) => {
+                <button
+                  className="text-gray-600"
+                  onClick={(e) => {
                     e.stopPropagation();
                     onComment(ticket);
-                  }} >
+                  }}
+                >
                   <MessageCircleMore size={16} />{" "}
                 </button>
-                  {profile?.role === "admin" ?
+                {profile?.role === "admin" || profile?.role === "support" ? (
                   <>
-                  <button
-                  className="text-blue-500"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEdit(ticket);
-                  }}
-                >
-                  <SquarePen size={16} />
-                </button>
-                <button
-                  className="text-red-500"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(ticket.id);
-                  }}
-                >
-                  <Trash2 size={16} />
-                </button>
+                    <button
+                      className="text-blue-500"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEdit(ticket);
+                      }}
+                    >
+                      <SquarePen size={16} />
+                    </button>
+                    <button
+                      className="text-red-500"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(ticket.id);
+                      }}
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   </>
-                  : "" }
-                
+                ) : (
+                  ""
+                )}
               </TableCell>
             </TableRow>
           ))}

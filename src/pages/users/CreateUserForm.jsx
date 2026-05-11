@@ -4,6 +4,7 @@ import { collection, doc, getDocs, query, orderBy, serverTimestamp, setDoc, wher
 import { fetchSignInMethodsForEmail } from "firebase/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { auth } from "@/lib/firebase";
+import Spinner from "@/components/ui/spinner";
 
 export default function CreateUserForm({ onClose }) {
   const queryClient = useQueryClient();
@@ -186,8 +187,9 @@ export default function CreateUserForm({ onClose }) {
             {...register("role", { required: true })}
             className="text-xs w-full bg-transparent outline-none"
           >
-            <option value="user">Standard User</option>
             <option value="admin">Administrator</option>
+            <option value="support">Support</option>
+            <option value="user">Standard User</option>
           </select>
         </div>
       </div>
@@ -205,9 +207,9 @@ export default function CreateUserForm({ onClose }) {
         <button
           type="submit"
           disabled={mutation.isPending}
-          className="py-1.5 border px-4 text-xs rounded-sm bg-azure-pop text-white font-semibold disabled:opacity-50"
+          className="py-1.5 border px-4 text-xs rounded-sm bg-azure-pop text-white font-semibold disabled:opacity-50 flex items-center justify-center "
         >
-          {mutation.isPending ? "Creating..." : "Create User"}
+          {mutation.isPending ? <>Creating <Spinner /></> : "Create User"}
         </button>
       </div>
     </form>

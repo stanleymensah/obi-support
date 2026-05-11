@@ -6,11 +6,13 @@ import { LogOut, UserRound } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import Spinner from "../ui/spinner";
 
 export default function Layout() {
   const [dropdown, setDropdown] = useState(false);
   // eslint-disable-next-line no-unused-vars
   const { user, profile, loading } = useAuth();
+
   const navigate = useNavigate();
 
   const hanldeLogout = async () => {
@@ -22,12 +24,15 @@ export default function Layout() {
       console.log(err.message);
     }
   };
-
-  if (loading) return <div>Loading Profile...</div>;
-
   if (!profile) {
     return <Navigate to="/" replace />;
   }
+  if (loading)
+    return (
+      <div className="w-full flex items-center justify-center">
+        Loading Profile <Spinner />{" "}
+      </div>
+    );
 
   return (
     <>
@@ -44,7 +49,7 @@ export default function Layout() {
           </div>
         </div>
       </main>
-      
+
       {dropdown && (
         <>
           {/* 1. Invisible Full-Screen Backdrop */}

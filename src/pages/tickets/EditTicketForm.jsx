@@ -3,6 +3,7 @@ import { db } from "@/lib/firebase";
 import { doc, updateDoc, collection, getDocs, query, where, orderBy } from "firebase/firestore";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/context/AuthContext";
+import Spinner from "@/components/ui/spinner";
 
 export default function EditTicketForm({ onClose, ticket }) {
   const { user, profile } = useAuth();
@@ -41,6 +42,7 @@ export default function EditTicketForm({ onClose, ticket }) {
           queryClient.setQueryData(["tickets", user?.uid], tickets);
         } catch (e) {
           queryClient.invalidateQueries({ queryKey: ["tickets", user?.uid] });
+          console.log(e.message)
         }
       })();
       if (onClose) onClose();
@@ -168,9 +170,9 @@ export default function EditTicketForm({ onClose, ticket }) {
           <button
             type="submit"
             disabled={mutation.isPending}
-            className="py-1 border px-2 text-xs rounded-sm bg-azure-pop text-white"
+            className="py-1 border border-azure-pop px-2 text-xs rounded-sm bg-azure-pop text-white flex items-center justify-center"
           >
-            {mutation.isPending ? "Saving..." : "Save Changes"}
+            {mutation.isPending ? <>Saving <Spinner/></> : "Save Changes"}
           </button>
         </div>
       </form>

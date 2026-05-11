@@ -38,7 +38,11 @@ export default function UserPage() {
           </div>
           <div className="tickets flex flex-col gap-2">
             <div className="border-b border-black/10 pb-1">
-              <h4>Tickets</h4>
+              <h4>Edit Profile</h4>
+            </div>
+
+            <div className="details">
+              
             </div>
           </div>
         </div>

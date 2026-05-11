@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import Spinner from "@/components/ui/spinner";
 
 export default function Login() {
   const [loginError, setLoginError] = useState("");
@@ -28,7 +29,7 @@ export default function Login() {
   return (
     <div className="flex flex-col gap-4 w-full px-8">
         <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold">Welcome back!</h1>
+        <h1 className="text-3xl font-bold">Welcome!</h1>
         <p className="text-xs text-gray-600">
           Enter to get unlimited access to data & information
         </p>
@@ -73,9 +74,9 @@ export default function Login() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="text-white bg-azure-pop py-3 w-full rounded-lg font-semibold mt-4"
+          className="text-white bg-azure-pop py-3 w-full rounded-lg font-semibold mt-4 flex items-center justify-center"
         >
-          {isSubmitting ? "Logging in..." : "Login"}
+          {isSubmitting ? <>Logging in <Spinner /> </> : "Login"}
         </button>
       </form>
     </div>

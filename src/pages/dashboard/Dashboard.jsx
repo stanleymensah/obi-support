@@ -2,6 +2,7 @@ import StatCard from "@/components/ui/statCard";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 import Status from "./Status";
 import Priority from "./Priority";
+import Spinner from "@/components/ui/spinner";
 
 export default function Dashboard() {
   const {
@@ -15,7 +16,7 @@ export default function Dashboard() {
     isLoading,
   } = useDashboardStats();
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div className="w-full flex items-center justify-center" >Loading <Spinner /></div>;
 
   return (
     <>

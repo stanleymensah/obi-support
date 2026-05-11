@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { db } from "@/lib/firebase";
 import { doc, updateDoc, collection, getDocs, query, orderBy } from "firebase/firestore";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Spinner from "@/components/ui/spinner";
 
 export default function EditUserForm({ onClose, userToEdit }) {
   const queryClient = useQueryClient();
@@ -35,6 +36,7 @@ export default function EditUserForm({ onClose, userToEdit }) {
           queryClient.setQueryData(["users"], users);
         } catch (e) {
           queryClient.invalidateQueries({ queryKey: ["users"] });
+          console.log(e.message)
         }
       })();
       if (onClose) onClose();
@@ -102,8 +104,9 @@ export default function EditUserForm({ onClose, userToEdit }) {
             {...register("role")}
             className="text-xs w-full bg-transparent outline-none"
           >
-            <option value="user">Standard User</option>
             <option value="admin">Administrator</option>
+            <option value="support">Support</option>
+            <option value="user">Standard User</option>
           </select>
         </div>
       </div>
@@ -120,9 +123,9 @@ export default function EditUserForm({ onClose, userToEdit }) {
         <button
           type="submit"
           disabled={mutation.isPending}
-          className="py-1 border px-3 text-xs rounded-sm bg-azure-pop text-white font-semibold disabled:opacity-50"
+          className="py-1 border border-azure-pop px-3 text-xs rounded-sm bg-azure-pop text-white font-semibold disabled:opacity-50 flex items-center justify-center"
         >
-          {mutation.isPending ? "Saving..." : "Update User"}
+          {mutation.isPending ? <>Updating <Spinner/></> : "Update User"}
         </button>
       </div>
     </form>

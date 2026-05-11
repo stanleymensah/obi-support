@@ -21,12 +21,12 @@ export default function UsersTable({
   return (
     <>
       <Table>
-        {/* <TableCaption>A list of all users.</TableCaption>{" "} */}
         {users.length === 0 && (
-          <TableCaption className="w-full flex items-center justify-center">
-            <p>No Users</p>
+          <TableCaption>
+            No Users found.
           </TableCaption>
         )}
+        {/* <TableCaption>A list of all users.</TableCaption>{" "} */}
         <TableHeader>
           <TableRow>
             <TableHead className="w-20">ID</TableHead>
@@ -65,7 +65,7 @@ export default function UsersTable({
                 {user.firstName} {user.lastName}
               </TableCell>
               <TableCell className="py-2">{user.email}</TableCell>
-              <TableCell className="py-2">{user.role}</TableCell>
+              <TableCell className="py-2 capitalize">{user.role}</TableCell>
               <TableCell className="text-right py-2">
                 {formatDate(user.createdAt)}
               </TableCell>

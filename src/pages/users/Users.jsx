@@ -1,4 +1,6 @@
 import { Search } from "lucide-react";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 import UsersTable from "./UsersTable";
 import { useUsers } from "@/hooks/useUsers";
 import { useMemo, useState } from "react";
@@ -12,9 +14,11 @@ import UserDetails from "./UserDetails";
 import usePagination from "@/hooks/usePagination";
 import Pagination from "@/components/common/Pagination";
 import { sortByCreatedAt } from "@/lib/utils";
+import Spinner from "@/components/ui/spinner";
 
 export default function Users() {
   const { data: users, isLoading, error } = useUsers();
+  const { profile } = useAuth();
   const deleteMutation = useDeleteUser();
   const [isCreating, setIsCreating] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -85,7 +89,11 @@ export default function Users() {
     setSortOrder((current) => (current === "asc" ? "desc" : "asc"));
   };
 
-  if (isLoading) return <div>Loading users...</div>;
+  if (isLoading) return <div className="w-full flex items-center justify-center">Loading users <Spinner /></div>;
+
+  if (profile?.role !== "admin") {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <>
@@ -148,7 +156,7 @@ export default function Users() {
       )}
 
       {isEditing && (
-        <Modal size="sm" title="Edit Ticket" onClose={handleCancelEdit}>
+        <Modal size="sm" title="Edit User" onClose={handleCancelEdit}>
           <EditUserForm userToEdit={userToEdit} onClose={handleCancelEdit} />
         </Modal>
       )}
@@ -167,6 +175,7 @@ export default function Users() {
           approve="Delete"
           onCancel={handleCancelDelete}
           onClose={handleCancelDelete}
+          confirmId={userToDelete}
         />
       )}
     </>

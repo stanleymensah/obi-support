@@ -3,6 +3,7 @@ import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp, getDocs, query, where, orderBy } from "firebase/firestore";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/context/AuthContext";
+import Spinner from "@/components/ui/spinner";
 
 export default function CreateTicketForm({ onClose }) {
   const { user, profile } = useAuth();
@@ -52,6 +53,7 @@ export default function CreateTicketForm({ onClose }) {
           const snapshot = await getDocs(q);
           const tickets = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
           queryClient.setQueryData(["tickets", user?.uid], tickets);
+        // eslint-disable-next-line no-unused-vars
         } catch (e) {
           queryClient.invalidateQueries({ queryKey: ["tickets", user?.uid] });
         }
@@ -145,19 +147,21 @@ export default function CreateTicketForm({ onClose }) {
                 </div>
               </div>
 
-              <div className="email col-span-1">
-                <label className="label text-xs font-medium text-gray-600 ">
-                  Assign to
-                </label>
-                <div className="border py-1.5 px-3 rounded-sm flex items-center">
-                  <input
-                    {...register("assignee")}
-                    type="text"
-                    placeholder="Assignee name"
-                    className="text-xs w-full bg-transparent outline-none"
-                  />
+              {profile?.role !== "user" && (
+                <div className="email col-span-1">
+                  <label className="label text-xs font-medium text-gray-600 ">
+                    Assign to
+                  </label>
+                  <div className="border py-1.5 px-3 rounded-sm flex items-center">
+                    <input
+                      {...register("assignee")}
+                      type="text"
+                      placeholder="Assignee name"
+                      className="text-xs w-full bg-transparent outline-none"
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <div className="title">
@@ -196,9 +200,9 @@ export default function CreateTicketForm({ onClose }) {
               <button
                 type="submit"
                 disabled={mutation.isPending}
-                className="py-1 border px-2 text-xs rounded-sm bg-azure-pop text-white"
+                className="py-1 border border-azure-pop px-2 text-xs rounded-sm bg-azure-pop text-white flex items-center justify-center"
               >
-                {mutation.isPending ? "Creating..." : "Create"}
+                {mutation.isPending ? <>Creating <Spinner /> </> : "Create"}
               </button>
             </div>
           </form>
