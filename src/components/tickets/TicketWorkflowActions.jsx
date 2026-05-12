@@ -22,6 +22,11 @@ const getUserDisplayName = (user) => {
     .trim();
 };
 
+const isAssignableUser = (user) => {
+  const role = String(user?.role || "").toLowerCase();
+  return role === "support" || role === "admin";
+};
+
 export default function TicketWorkflowActions({
   ticket,
   users = [],
@@ -35,7 +40,10 @@ export default function TicketWorkflowActions({
   onReopenTicket,
 }) {
   const availableUsers = useMemo(() => {
-    return users.map(getUserDisplayName).filter(Boolean);
+    return users
+      .filter(isAssignableUser)
+      .map(getUserDisplayName)
+      .filter(Boolean);
   }, [users]);
 
   const status = normalizeStatus(ticket?.status);

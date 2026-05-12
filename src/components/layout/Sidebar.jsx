@@ -7,7 +7,7 @@ export default function Sidebar() {
   return (
     <>
       <div className="border rounded-sm flex flex-col gap-4 w-full h-full border-black/10 px-2 bg-white shadow-sm inset-shadow-sm inset-shadow-azure-pop/10">
-        <div className="top flex items-center gap-2 w-full justify-center h-12">
+        <div className="top flex items-center gap-1 w-full justify-center h-12">
           <img src="/images/help.png" alt="" className="w-4" />
           <h4 className="text-azure-dark">Obi Support</h4>
         </div>

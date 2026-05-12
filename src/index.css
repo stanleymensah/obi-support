@@ -12,6 +12,7 @@
   --color-azure-pop: oklch(65% 0.32 260);
   --color-azure-dark: oklch(0.5893 0.32 260);
   --color-azure-surface: oklch(95% 0.02 260);
+  --color-azure-darkest: oklch(20.36% 0.109 263.51);
 
   --color-rose-pop: oklch(65% 0.25 15);
   --color-rose-surface: oklch(95% 0.02 15);
