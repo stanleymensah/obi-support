@@ -55,7 +55,7 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
     setPriorityFilter,
     filteredTickets,
   } = useTicketFilters(tickets, sortedTickets, debouncedSearch);
-  const pagination = usePagination(filteredTickets, 8);
+  const pagination = usePagination(filteredTickets, 7);
 
   const handleComment = (ticket) => {
     setCommentTicket(ticket);
@@ -165,7 +165,7 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
         </div>
 
         <div className="w-full px-4 flex flex-col flex-1 min-h-0">
-          <div className="w-full flex flex-col gap-2 md:gap-0 md:flex-row items-center justify-between text-gray-600 py-4 shrink-0">
+          <div className="w-full flex flex-col gap-2 md:gap-0 md:flex-row items-center justify-between text-gray-600 py-3 shrink-0">
             <div className="search border py-3 md:py-1.5 px-3 rounded-sm flex items-center gap-1 w-full md:w-1/2">
               <Search size={14} />
               <input

@@ -1,18 +1,45 @@
 import { useAuth } from "@/context/AuthContext";
 import { ChevronDown, Ticket, LayoutGrid, UserRoundCog } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import { useMemo } from "react";
+import { useTickets } from "@/hooks/useTickets";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function Header({ showDropdown }) {
   // eslint-disable-next-line no-unused-vars
   const { profile, user } = useAuth();
+  const { data: tickets = [] } = useTickets();
+
+  // Count tickets assigned to the current user
+  const assignedCount = useMemo(() => {
+    if (!profile) return 0;
+
+    const userIdentifiers = [
+      String(profile.email).toLowerCase(),
+      `${profile.firstName || ""} ${profile.lastName || ""}`
+        .trim()
+        .toLowerCase(),
+    ].filter(Boolean);
+
+    return tickets.filter((t) => {
+      const assignee = String(t.assignee || "").toLowerCase();
+      return userIdentifiers.some((id) => id === assignee);
+    }).length;
+  }, [tickets, profile]);
 
   return (
     <>
-      <header className="h-16 md:h-12 rounded-sm border shadow-sm px-4 flex items-center bg-white justify-between md:justify-end gap-2">
+      <header className="h-16 md:h-12 rounded-sm border shadow-sm px-4 flex items-center bg-white justify-between gap-2 md:gap-4">
         <div className="flex items-center gap-1 md:hidden">
           <NavLink
             to="/dashboard"
-            className={({ isActive }) => (isActive ? "link-active-m" : "link-m")}
+            className={({ isActive }) =>
+              isActive ? "link-active-m" : "link-m"
+            }
           >
             <LayoutGrid size={16} />
             {/* <p className="text-xs">Dashboard</p> */}
@@ -20,7 +47,9 @@ export default function Header({ showDropdown }) {
 
           <NavLink
             to="/tickets"
-            className={({ isActive }) => (isActive ? "link-active-m" : "link-m")}
+            className={({ isActive }) =>
+              isActive ? "link-active-m" : "link-m"
+            }
           >
             <Ticket size={16} />
             {/* <text className="text-xs">Ticket</text> */}
@@ -42,11 +71,38 @@ export default function Header({ showDropdown }) {
             ""
           )}
         </div>
+
+        <div className="hidden md:flex flex-col justify-center">
+          <p className="text-base text-gray-700">
+            Greetings,{" "}
+            <span className="text-azure-dark text-base font-medium">
+              {profile?.firstName || "User"}
+            </span>
+          </p>
+        </div>
+
+        <div className="flex-1" />
+        <Tooltip>
+          <TooltipTrigger>
+            <div className="hidden md:flex items-center cursor-pointer relative border p-1.5 rounded-full">
+              <Ticket size={18} className="text-gray-500" />
+              {assignedCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full border-white">
+                  {assignedCount > 99 ? "99+" : assignedCount}
+                </span>
+              )}
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p className="text-[10px]">Assigned Tickets</p>
+          </TooltipContent>
+        </Tooltip>
+
         <div
           className="user flex items-center gap-2 cursor-pointer"
           onClick={showDropdown}
         >
-          <div className="img w-7">
+          <div className="img w-8">
             <img
               src="/images/pfp.jpg"
               alt=""

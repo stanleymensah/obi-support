@@ -8,6 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import Spinner from "../ui/spinner";
+import Footer from "./Footer";
 
 export default function Layout() {
   const [dropdown, setDropdown] = useState(false);
@@ -37,7 +38,7 @@ export default function Layout() {
 
   return (
     <>
-      <main className="relative w-full flex flex-col md:grid md:grid-cols-12 gap-4 p-4 h-screen overflow-hidden bg-linear-to-b from-azure-surface via-azure-pop/10 to-azure-pop/20">
+      <main className="relative w-full flex flex-col md:grid md:grid-cols-12 gap-2 p-2 h-screen overflow-hidden bg-linear-to-b from-azure-surface via-azure-pop/10 to-azure-pop/20">
         <div className="hidden md:flex md:col-span-2 md:h-full md:min-h-0">
           <Sidebar />
         </div>
@@ -48,6 +49,8 @@ export default function Layout() {
           <div className="flex-1 overflow-auto">
             <Outlet />
           </div>
+
+          <Footer />
         </div>
       </main>
 

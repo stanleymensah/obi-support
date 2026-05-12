@@ -42,7 +42,7 @@ export default function Dashboard() {
         </div>
 
         <div className="charts flex flex-col md:grid md:grid-cols-2 gap-2 flex-1">
-          <div className="pie-chart flex flex-col gap-2 border-black/10 bg-white shadow-sm inset-shadow-sm inset-shadow-azure-pop/10 rounded-sm py-3 px-4 col-span-1">
+          <div className="pie-chart flex flex-col justify-between gap-2 border-black/10 bg-white shadow-sm inset-shadow-sm inset-shadow-azure-pop/10 rounded-sm py-3 px-4 col-span-1">
             <div className="w-full`">
               <h4>By Priority</h4>
             </div>
@@ -50,7 +50,7 @@ export default function Dashboard() {
               <Status data={priorityData} />
             </div>
           </div>
-          <div className="pie-chart flex flex-col gap-2 border-black/10 px-4 bg-white shadow-sm inset-shadow-sm inset-shadow-azure-pop/10 rounded-sm py-3 col-span-1">
+          <div className="pie-chart flex flex-col justify-between gap-2 border-black/10 px-4 bg-white shadow-sm inset-shadow-sm inset-shadow-azure-pop/10 rounded-sm py-3 col-span-1">
             <div>
               <h4>By Status</h4>
             </div>

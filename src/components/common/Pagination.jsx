@@ -9,7 +9,7 @@ export default function Pagination({ pagination }) {
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex flex-col md:flex-row items-center justify-between gap-3 px-4 py-3 bg-white border-t border-gray-100">
+    <div className="flex flex-col md:flex-row items-center justify-between gap-3 px-4 py-2 bg-white border-t border-gray-100">
       <div className="text-xs text-gray-500 order-2 md:order-1">
         Page <span className="font-bold text-gray-700">{currentPage}</span> of <span className="font-bold text-gray-700">{totalPages}</span>
       </div>
