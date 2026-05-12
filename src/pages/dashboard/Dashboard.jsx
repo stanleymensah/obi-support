@@ -20,7 +20,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <div className="container w-full flex flex-col gap-4 h-full">
+      <div className="container w-full flex flex-col gap-2 h-full">
         <div className="relative hero h-60 md:h-48">
           <img
             src="/images/banner.jpg"

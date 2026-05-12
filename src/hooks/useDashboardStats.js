@@ -1,9 +1,7 @@
 import { useMemo } from "react";
-import { useAuth } from "@/context/AuthContext";
 import { useTickets } from "./useTickets";
 
 export function useDashboardStats() {
-  const { user, profile } = useAuth();
   const { data: tickets, isLoading } = useTickets();
 
   const stats = useMemo(() => {
@@ -12,7 +10,11 @@ export function useDashboardStats() {
     const total = allTickets.length;
     const open = allTickets.filter((t) => t.status === "Open").length;
     const closed = allTickets.filter((t) => t.status === "Closed").length;
-    const assigned = allTickets.filter(t => t.assignee !== "").length
+    const assigned = allTickets.filter((t) => {
+      const assignee = String(t.assignee || "").trim();
+      const status = String(t.status || "").trim().toLowerCase();
+      return assignee !== "" && status === "assigned";
+    }).length;
     const inProgress = allTickets.filter(
       (t) => t.status === "In Progress",
     ).length;

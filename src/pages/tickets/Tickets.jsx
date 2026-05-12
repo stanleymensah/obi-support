@@ -20,7 +20,7 @@ import Pagination from "@/components/common/Pagination";
 import { useUsers } from "@/hooks/useUsers";
 import { useUpdateTicket } from "@/hooks/useUpdateTicket";
 
-export default function Tickets() {
+export default function Tickets({ assignedOnly = false }) {
   const { data: tickets, isLoading, error } = useTickets();
   const { data: users } = useUsers();
   const [isCreating, setIsCreating] = useState(false);
@@ -44,9 +44,27 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
 
   const debouncedSearch = useDebounce(searchTerm);
 
+  const baseTickets = useMemo(() => {
+    if (assignedOnly && profile) {
+      const userIdentifiers = [
+        String(profile.email || "").toLowerCase(),
+        `${profile.firstName || ""} ${profile.lastName || ""}`
+          .trim()
+          .toLowerCase(),
+      ].filter(Boolean);
+
+      return (tickets || []).filter((t) => {
+        const assignee = String(t.assignee || "").toLowerCase();
+        return userIdentifiers.some((id) => id === assignee);
+      });
+    }
+
+    return tickets || [];
+  }, [tickets, profile, assignedOnly]);
+
   const sortedTickets = useMemo(() => {
-    return sortByCreatedAt(tickets || [], sortOrder);
-  }, [tickets, sortOrder]);
+    return sortByCreatedAt(baseTickets || [], sortOrder);
+  }, [baseTickets, sortOrder]);
 
   const {
     statusFilter,

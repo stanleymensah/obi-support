@@ -1,5 +1,5 @@
 import { useAuth } from "@/context/AuthContext";
-import { ChevronDown, Ticket, LayoutGrid, UserRoundCog } from "lucide-react";
+import { ChevronDown, Ticket, LayoutGrid, UserRoundCog, PanelBottomClose } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useMemo } from "react";
 import { useTickets } from "@/hooks/useTickets";
@@ -84,14 +84,14 @@ export default function Header({ showDropdown }) {
         <div className="flex-1" />
         <Tooltip>
           <TooltipTrigger>
-            <div className="hidden md:flex items-center cursor-pointer relative border p-1.5 rounded-full">
-              <Ticket size={18} className="text-gray-500" />
+            <NavLink to="/tickets/assigned" className="hidden md:flex items-center cursor-pointer relative border p-1.5 rounded-full">
+              <PanelBottomClose  size={18} className="text-gray-500" />
               {assignedCount > 0 && (
                 <span className="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full border-white">
                   {assignedCount > 99 ? "99+" : assignedCount}
                 </span>
               )}
-            </div>
+            </NavLink>
           </TooltipTrigger>
           <TooltipContent>
             <p className="text-[10px]">Assigned Tickets</p>

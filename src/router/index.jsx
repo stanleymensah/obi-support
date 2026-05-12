@@ -24,6 +24,10 @@ const router = createBrowserRouter([
         element: <Tickets />,
       },
       {
+        path: "/tickets/assigned",
+        element: <Tickets assignedOnly={true} />,
+      },
+      {
         path: "/manage-users",
         element: <Users />,
       },

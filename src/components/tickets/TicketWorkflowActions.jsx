@@ -43,11 +43,11 @@ export default function TicketWorkflowActions({
 
   if (!canManageTickets) {
     return (
-      <div className="flex w-full flex-col items-center py-2">
-        <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+      <div className="flex w-full flex-col items-center gap-1">
+        <span className="text-xs font-medium">
           Ticket Actions
         </span>
-        <p className="mt-2 text-xs text-muted-foreground">
+        <p className="text-xs text-muted-foreground">
           Only the assigned user or admins can change ticket workflow.
         </p>
       </div>
@@ -55,12 +55,12 @@ export default function TicketWorkflowActions({
   }
 
   return (
-    <div className="flex w-full flex-col items-center py-2">
-      <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+    <div className="flex w-full flex-col items-center justify-center gap-1">
+      <span className="text-xs font-medium">
         Ticket Actions
       </span>
 
-      <div className="mt-2 w-full">
+      <div className="w-full">
         {status === "open" && (
           <div className="flex w-full items-end gap-2">
             <div className="flex-1">
@@ -99,7 +99,7 @@ export default function TicketWorkflowActions({
               type="button"
               size="xs"
               variant="secondary"
-              className="h-auto px-3 py-1.5 text-xs whitespace-nowrap"
+              className="h-auto px-2 py-1 text-xs whitespace-nowrap"
               onClick={onStartWork}
             >
               Start Work
@@ -113,7 +113,7 @@ export default function TicketWorkflowActions({
               type="button"
               size="xs"
               variant="secondary"
-              className="h-auto px-3 py-1.5 text-xs whitespace-nowrap"
+              className="h-auto px-2 py-1 text-xs whitespace-nowrap"
               onClick={onMarkResolved}
             >
               Mark as Resolved
@@ -127,7 +127,7 @@ export default function TicketWorkflowActions({
               type="button"
               size="xs"
               variant="secondary"
-              className="h-auto px-3 py-1.5 text-xs whitespace-nowrap"
+              className="h-auto px-2 py-1 text-xs whitespace-nowrap"
               onClick={onCloseTicket}
             >
               Close Ticket
@@ -136,7 +136,7 @@ export default function TicketWorkflowActions({
               type="button"
               size="xs"
               variant="secondary"
-              className="h-auto px-3 py-1.5 text-xs whitespace-nowrap"
+              className="h-auto px-2 py-1 text-xs whitespace-nowrap"
               onClick={onReopenTicket}
             >
               Reopen Ticket
@@ -145,7 +145,7 @@ export default function TicketWorkflowActions({
         )}
 
         {status === "closed" && (
-          <p className="text-xs text-muted-foreground">Ticket Closed</p>
+          <p className="text-xs">Ticket Closed</p>
         )}
 
         {![

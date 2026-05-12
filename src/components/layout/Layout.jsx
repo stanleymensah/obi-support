@@ -12,7 +12,6 @@ import Footer from "./Footer";
 
 export default function Layout() {
   const [dropdown, setDropdown] = useState(false);
-  // eslint-disable-next-line no-unused-vars
   const { user, profile, loading } = useAuth();
 
   const navigate = useNavigate();

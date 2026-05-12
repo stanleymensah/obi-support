@@ -5,10 +5,34 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/context/AuthContext";
 import Spinner from "@/components/ui/spinner";
 import { toast } from "sonner";
+import { useUsers } from "@/hooks/useUsers";
+
+const getUserDisplayName = (user) => {
+  if (typeof user === "string") {
+    return user.trim();
+  }
+
+  return (
+    user?.fullName ??
+    user?.name ??
+    `${user?.firstName || ""} ${user?.lastName || ""}`.trim() ??
+    user?.username ??
+    user?.email ??
+    ""
+  )
+    .toString()
+    .trim();
+};
 
 export default function CreateTicketForm({ onClose }) {
   const { user, profile } = useAuth();
+  const { data: users = [] } = useUsers();
   const queryClient = useQueryClient();
+
+  const assignableUsers = users.filter((candidate) => {
+    const role = String(candidate?.role || "").toLowerCase();
+    return role === "support" || role === "admin";
+  });
 
 
   const buildTicketNumber = () => {
@@ -159,12 +183,21 @@ export default function CreateTicketForm({ onClose }) {
                     Assign to
                   </label>
                   <div className="border py-1.5 px-3 rounded-sm flex items-center">
-                    <input
+                    <select
                       {...register("assignee")}
-                      type="text"
-                      placeholder="Assignee name"
                       className="text-xs w-full bg-transparent outline-none"
-                    />
+                      defaultValue=""
+                    >
+                      <option value="">Select user</option>
+                      {assignableUsers.map((u) => {
+                        const displayName = getUserDisplayName(u);
+                        return (
+                          <option key={u.id || displayName} value={displayName}>
+                            {displayName}
+                          </option>
+                        );
+                      })}
+                    </select>
                   </div>
                 </div>
               )}
