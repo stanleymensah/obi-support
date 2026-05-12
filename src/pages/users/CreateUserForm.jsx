@@ -204,7 +204,7 @@ export default function CreateUserForm({ onClose }) {
       <div className="buttons flex items-center justify-end gap-4 mt-2">
         <button
           type="button"
-          className="text-xs text-gray-500 hover:underline"
+          className="text-xs text-gray-500 px-4 py-1.5 border rounded-sm"
           onClick={onClose}
         >
           Cancel
@@ -213,7 +213,7 @@ export default function CreateUserForm({ onClose }) {
         <button
           type="submit"
           disabled={mutation.isPending}
-          className="py-1.5 border px-4 text-xs rounded-sm bg-azure-pop text-white font-semibold disabled:opacity-50 flex items-center justify-center "
+          className="py-1.5 border border-azure-pop px-4 text-xs rounded-sm bg-azure-pop text-white font-semibold disabled:opacity-50 flex items-center justify-center "
         >
           {mutation.isPending ? <>Creating <Spinner /></> : "Create User"}
         </button>

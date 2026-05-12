@@ -104,12 +104,12 @@ export default function Users() {
 
         <div className="w-full px-4 flex flex-col flex-1 min-h-0">
           <div className="w-full flex items-center justify-between text-gray-600 py-4 shrink-0">
-            <div className="search border py-1.5 px-3 rounded-sm flex items-center gap-1 w-1/2">
+            <div className="search border py-1.5 px-3 rounded-sm flex items-center gap-1 w-4/5 md:w-1/2">
               <Search size={14} />
               <input
                 type="text"
                 placeholder="Search by name, email..."
-                className="text-xs w-full"
+                className="text-xs py-1 md:py-0 w-full"
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>

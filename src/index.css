@@ -44,7 +44,7 @@
   }
 
   h4{
-    @apply text-sm font-medium tracking-tight;
+    @apply text-lg md:text-sm font-medium tracking-tight;
   }
 
   p {
@@ -69,6 +69,12 @@
     }
     .link {
       @apply text-black/50 flex items-center gap-2 py-1 px-3;
+    }
+    .link-active-m {
+      @apply text-azure-pop flex items-center gap-2 py-2 px-3 font-medium rounded-sm bg-white shadow-sm shadow-azure-pop/20 inset-shadow-sm inset-shadow-sky-500/10 border border-black/10;
+    }
+    .link-m {
+      @apply text-black/50 flex items-center gap-2 py-2 px-3;
     }
   }
   * {

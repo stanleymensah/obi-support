@@ -165,8 +165,8 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
         </div>
 
         <div className="w-full px-4 flex flex-col flex-1 min-h-0">
-          <div className="w-full flex items-center justify-between text-gray-600 py-4 shrink-0">
-            <div className="search border py-1.5 px-3 rounded-sm flex items-center gap-1 w-1/2">
+          <div className="w-full flex flex-col gap-2 md:gap-0 md:flex-row items-center justify-between text-gray-600 py-4 shrink-0">
+            <div className="search border py-3 md:py-1.5 px-3 rounded-sm flex items-center gap-1 w-full md:w-1/2">
               <Search size={14} />
               <input
                 type="text"
@@ -175,7 +175,7 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <div className="flex items-center gap-2 ">
+            <div className="flex items-center justify-between md:justify-end md:gap-2 w-full md:w-1/2">
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
@@ -262,18 +262,30 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
 
       {isViewing && (
         <Modal size="sm" title={ticketToView.title} onClose={handleCloseView}>
-          <TicketDetails
-            ticket={ticketToView}
-            users={users || []}
-            effectiveAssignee={workflowAssignee}
-            canManageTickets={profile?.role === "admin"}
-            onAssigneeChange={setWorkflowAssignee}
-            onAssign={handleAssignAssignee}
-            onStartWork={handleStartWork}
-            onMarkResolved={handleMarkResolved}
-            onCloseTicket={handleCloseTicket}
-            onReopenTicket={handleReopenTicket}
-          />
+          {(() => {
+            // Only allow workflow actions if user is admin or assigned to the ticket
+            const isAdmin = profile?.role === "admin";
+            const isAssigned = ticketToView?.assignee && (
+              String(ticketToView.assignee).toLowerCase() === String(profile?.email || "").toLowerCase() ||
+              String(ticketToView.assignee).toLowerCase() === `${profile?.firstName || ""} ${profile?.lastName || ""}`.trim().toLowerCase()
+            );
+            const canManageTickets = isAdmin || isAssigned;
+
+            return (
+              <TicketDetails
+                ticket={ticketToView}
+                users={users || []}
+                effectiveAssignee={workflowAssignee}
+                canManageTickets={canManageTickets}
+                onAssigneeChange={setWorkflowAssignee}
+                onAssign={handleAssignAssignee}
+                onStartWork={handleStartWork}
+                onMarkResolved={handleMarkResolved}
+                onCloseTicket={handleCloseTicket}
+                onReopenTicket={handleReopenTicket}
+              />
+            );
+          })()}
         </Modal>
       )}
 

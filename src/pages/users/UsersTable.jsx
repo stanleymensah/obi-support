@@ -29,9 +29,9 @@ export default function UsersTable({
         {/* <TableCaption>A list of all users.</TableCaption>{" "} */}
         <TableHeader>
           <TableRow>
-            <TableHead className="w-20">ID</TableHead>
+            <TableHead className="w-20 hidden md:table-cell">ID</TableHead>
             <TableHead>User</TableHead>
-            <TableHead>Email</TableHead>
+            <TableHead className="hidden md:table-cell">Email</TableHead>
             <TableHead>Role</TableHead>
             <TableHead className="text-right">
               <button
@@ -58,18 +58,18 @@ export default function UsersTable({
                 onView(user);
               }}
             >
-              <TableCell className="font-medium py-2">
+              <TableCell className="font-medium py-2 hidden md:table-cell">
                 U-{user.id.slice(0, 5)}
               </TableCell>
-              <TableCell className="py-2">
+              <TableCell className="py-6 md:py-2">
                 {user.firstName} {user.lastName}
               </TableCell>
-              <TableCell className="py-2">{user.email}</TableCell>
+              <TableCell className="py-2 hidden md:table-cell">{user.email}</TableCell>
               <TableCell className="py-2 capitalize">{user.role}</TableCell>
               <TableCell className="text-right py-2">
                 {formatDate(user.createdAt)}
               </TableCell>
-              <TableCell className="text-right py-2 flex items-center justify-end gap-1 space-x-2">
+              <TableCell className="text-right py-6 md:py-2 flex items-center justify-end gap-1 space-x-2">
                 <button
                   className="text-blue-500"
                   onClick={(e) => {

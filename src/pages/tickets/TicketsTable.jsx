@@ -62,9 +62,9 @@ export default function TicketsTable({
         {tickets.length === 0 && <TableCaption>No tickets found!</TableCaption>}
         <TableHeader>
           <TableRow>
-            <TableHead className="w-20">ID</TableHead>
+            <TableHead className="w-20 hidden md:table-cell">ID</TableHead>
             <TableHead className="min-w-50">Title</TableHead>
-            <TableHead className="w-30">
+            <TableHead className="w-30 hidden md:table-cell">
               <button
                 type="button"
                 onClick={onToggleSort}
@@ -78,9 +78,9 @@ export default function TicketsTable({
                 )}
               </button>
             </TableHead>
-            <TableHead className="w-30">Priority</TableHead>
-            <TableHead className="w-25 text-right">Status</TableHead>
-            <TableHead className="w-37.5 text-right">Actions</TableHead>
+            <TableHead className="w-30 text-center">Priority</TableHead>
+            <TableHead className="w-25 text-center hidden md:table-cell">Status</TableHead>
+            <TableHead className="w-30 text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -91,14 +91,14 @@ export default function TicketsTable({
                 onView(ticket);
               }}
             >
-              <TableCell className="font-medium py-2">
+              <TableCell className="font-medium py-2 hidden md:table-cell">
                 T-{getDisplayNumber(ticket)}
               </TableCell>
-              <TableCell className="py-2">{ticket.title}</TableCell>
-              <TableCell className="py-2">
+              <TableCell className=" py-6 md:py-2">{ticket.title}</TableCell>
+              <TableCell className="py-2 hidden md:table-cell">
                 {formatRelativeTime(ticket.createdAt)}
               </TableCell>
-              <TableCell className="py-2">
+              <TableCell className="py-2 text-center">
                 {" "}
                 <Badge
                   variant={
@@ -110,7 +110,7 @@ export default function TicketsTable({
                   {ticket.priority}
                 </Badge>
               </TableCell>
-              <TableCell className="text-right py-2">
+              <TableCell className="text-center py-2 hidden md:table-cell">
                 <Badge
                   className={`${statusColors[ticket.status?.toLowerCase()] || "bg-gray-100"} capitalize font-medium`}
                   variant="outline"
@@ -118,7 +118,7 @@ export default function TicketsTable({
                   {ticket.status}
                 </Badge>
               </TableCell>
-              <TableCell className="text-right py-2 flex items-center justify-end gap-1 space-x-2">
+              <TableCell className="text-right py-6 md:py-2 flex items-center justify-end gap-1 space-x-1">
                 <button
                   className="text-gray-600"
                   onClick={(e) => {
@@ -128,7 +128,7 @@ export default function TicketsTable({
                 >
                   <MessageCircleMore size={16} />{" "}
                 </button>
-                {profile?.role === "admin" || profile?.role === "support" ? (
+                {profile?.role === "admin" ? (
                   <>
                     <button
                       className="text-blue-500"

@@ -4,7 +4,7 @@ import { useTickets } from "./useTickets";
 
 export function useDashboardStats() {
   const { user, profile } = useAuth();
-  const { data: tickets, isLoading } = useTickets(user, profile);
+  const { data: tickets, isLoading } = useTickets();
 
   const stats = useMemo(() => {
     const allTickets = tickets || [];

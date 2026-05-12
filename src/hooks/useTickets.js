@@ -20,48 +20,8 @@ export function useTickets() {
     (async () => {
       const ticketsRef = collection(db, "tickets");
 
-      if (profile?.role === "admin") {
-        const q = query(ticketsRef, orderBy("createdAt", "asc"));
-        const snapshot = await getDocs(q);
-        if (!mounted) return;
-        const tickets = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        queryClient.setQueryData(cacheKey, tickets);
-        return;
-      }
-
-      // support or regular user
-      if (profile?.role === "support") {
-        // Try to fetch tickets created by the user and tickets assigned to the support user.
-        const name = `${profile.firstName} ${profile.lastName}`;
-        const qUser = query(ticketsRef, where("userId", "==", user.uid), orderBy("createdAt", "asc"));
-        const qAssignedByName = query(ticketsRef, where("assignee", "==", name), orderBy("createdAt", "asc"));
-        const qAssignedByEmail = query(ticketsRef, where("assignee", "==", profile.email), orderBy("createdAt", "asc"));
-
-        const [snapUser, snapByName, snapByEmail] = await Promise.all([
-          getDocs(qUser),
-          getDocs(qAssignedByName),
-          getDocs(qAssignedByEmail),
-        ]);
-
-        if (!mounted) return;
-
-        const map = new Map();
-        [...snapUser.docs, ...snapByName.docs, ...snapByEmail.docs].forEach((doc) => {
-          map.set(doc.id, { id: doc.id, ...doc.data() });
-        });
-
-        const tickets = Array.from(map.values()).sort((a, b) => {
-          const aMs = a.createdAt?.toMillis ? a.createdAt.toMillis() : (a.createdAt?.seconds ? a.createdAt.seconds * 1000 : new Date(a.createdAt).getTime());
-          const bMs = b.createdAt?.toMillis ? b.createdAt.toMillis() : (b.createdAt?.seconds ? b.createdAt.seconds * 1000 : new Date(b.createdAt).getTime());
-          return aMs - bMs;
-        });
-
-        queryClient.setQueryData(cacheKey, tickets);
-        return;
-      }
-
-      // regular user: only tickets they created
-      const q = query(ticketsRef, where("userId", "==", user.uid), orderBy("createdAt", "asc"));
+      // All users see all tickets
+      const q = query(ticketsRef, orderBy("createdAt", "asc"));
       const snapshot = await getDocs(q);
       if (!mounted) return;
       const tickets = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));

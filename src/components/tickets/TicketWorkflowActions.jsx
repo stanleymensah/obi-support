@@ -48,7 +48,7 @@ export default function TicketWorkflowActions({
           Ticket Actions
         </span>
         <p className="mt-2 text-xs text-muted-foreground">
-          Only admins can change ticket workflow.
+          Only the assigned user or admins can change ticket workflow.
         </p>
       </div>
     );

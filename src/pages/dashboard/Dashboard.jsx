@@ -21,7 +21,7 @@ export default function Dashboard() {
   return (
     <>
       <div className="container w-full flex flex-col gap-4 h-full">
-        <div className="relative hero h-48">
+        <div className="relative hero h-60 md:h-48">
           <img
             src="/images/banner.jpg"
             alt=""
@@ -41,7 +41,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="charts grid grid-cols-2 gap-2 flex-1">
+        <div className="charts flex flex-col md:grid md:grid-cols-2 gap-2 flex-1">
           <div className="pie-chart flex flex-col gap-2 border-black/10 bg-white shadow-sm inset-shadow-sm inset-shadow-azure-pop/10 rounded-sm py-3 px-4 col-span-1">
             <div className="w-full`">
               <h4>By Priority</h4>

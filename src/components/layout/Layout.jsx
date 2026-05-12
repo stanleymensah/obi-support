@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import Sidebar from "./Sidebar";
 import { Link, useNavigate, Outlet, Navigate } from "react-router-dom";
 import Header from "./Header";
@@ -36,12 +37,12 @@ export default function Layout() {
 
   return (
     <>
-      <main className="relative w-full grid grid-cols-12 gap-4 p-4 h-screen overflow-hidden bg-linear-to-b from-azure-surface via-azure-pop/10 to-azure-pop/20">
-        <div className="col-span-2 h-full min-h-0">
+      <main className="relative w-full flex flex-col md:grid md:grid-cols-12 gap-4 p-4 h-screen overflow-hidden bg-linear-to-b from-azure-surface via-azure-pop/10 to-azure-pop/20">
+        <div className="hidden md:flex md:col-span-2 md:h-full md:min-h-0">
           <Sidebar />
         </div>
 
-        <div className="col-span-10 h-full min-h-0 overflow-auto flex flex-col gap-2">
+        <div className="w-full md:col-span-10 h-full min-h-0 overflow-y-auto flex flex-col gap-2">
           <Header showDropdown={() => setDropdown(!dropdown)} />
 
           <div className="flex-1 overflow-auto">
@@ -60,7 +61,7 @@ export default function Layout() {
 
           {/* 2. The Menu (Z-index must be higher than backdrop) */}
           <div className="bg-white border absolute z-50 top-16 right-4 flex flex-col px-2 rounded-md shadow-xl py-1 overflow-hidden min-w-35">
-            <button
+            {/* <button
               className="w-full text-left"
               onClick={() => setDropdown(false)}
             >
@@ -71,7 +72,7 @@ export default function Layout() {
                 <UserRound size={14} />
                 <span className="text-xs">Profile</span>
               </Link>
-            </button>
+            </button> */}
 
             <hr className="border-gray-100" />
 
