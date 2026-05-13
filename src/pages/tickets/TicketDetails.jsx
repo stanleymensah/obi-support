@@ -1,6 +1,10 @@
-import TicketWorkflowActions from "@/components/tickets/TicketWorkflowActions";
+// import TicketWorkflowActions from "@/components/tickets/TicketWorkflowActions";
 import { formatDate } from "@/lib/utils";
 import { ASSIGNEE_DISPLAY_FIELD, getTicketAssigneeLabel } from "@/lib/assignee";
+import { useEffect, useState } from "react";
+import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import TicketComments from "./Comments";
 
 const normalizeStatus = (status) =>
   String(status ?? "closed")
@@ -9,13 +13,19 @@ const normalizeStatus = (status) =>
     .replace(/\s+/g, "-");
 
 const formatStatusLabel = (status) => {
-  const normalized = String(status ?? "closed").trim().replace(/[-_]+/g, " ");
+  const normalized = String(status ?? "closed")
+    .trim()
+    .replace(/[-_]+/g, " ");
   const key = String(status ?? "closed")
     .trim()
     .toLowerCase()
     .replace(/[^a-z]/g, "");
 
-  if (key.includes("inprog") || key.includes("inprogress") || key.includes("profress")) {
+  if (
+    key.includes("inprog") ||
+    key.includes("inprogress") ||
+    key.includes("profress")
+  ) {
     return "In-prog";
   }
 
@@ -33,7 +43,9 @@ const formatStatusLabel = (status) => {
     ? normalized
         .split(/\s+/)
         .filter(Boolean)
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+        )
         .join(" ")
     : "Closed";
 };
@@ -41,24 +53,38 @@ const formatStatusLabel = (status) => {
 export default function TicketDetails({
   ticket,
   users,
-  effectiveAssignee,
-  canManageTickets = true,
-  onAssigneeChange,
-  onAssign,
-  onStartWork,
-  onMarkResolved,
-  onCloseTicket,
-  onReopenTicket,
+  profile,
+  // effectiveAssignee,
+  // canManageTickets = true,
+  // onAssigneeChange,
+  // onAssign,
+  // onStartWork,
+  // onMarkResolved,
+  // onCloseTicket,
+  // onReopenTicket,
 }) {
   const status = normalizeStatus(ticket.status);
   const statusKey = String(status ?? "").replace(/[^a-z]/g, "");
+  const [showComments, setShowComments] = useState(false);
+  const [commentsCount, setCommentsCount] = useState(0);
+
+  useEffect(() => {
+    if (!ticket?.id) return;
+    const colRef = collection(db, "tickets", ticket.id, "comments");
+    const q = query(colRef, orderBy("createdAt", "asc"));
+    const unsub = onSnapshot(q, (snapshot) => {
+      setCommentsCount(snapshot.size || 0);
+    });
+
+    return () => unsub();
+  }, [ticket?.id]);
 
   return (
     <div className="flex flex-col gap-3 p-1">
       {/* Description Section */}
       <div className="flex flex-col gap-2">
         <h4 className="text-xs font-medium  tracking-wider ">Description</h4>
-        <div className="w-full bg-gray-50/50 border border-gray-100 p-2 rounded-sm text-xs text-gray-700 leading-relaxed shadow-inner">
+        <div className="w-full bg-gray-50/50 border border-gray-100 p-2 rounded-sm text-xs h-20 min-w-92 text-gray-700 leading-relaxed shadow-inner">
           {ticket.description || "No description provided."}
         </div>
       </div>
@@ -70,7 +96,8 @@ export default function TicketDetails({
         <div className="flex flex-col gap-1">
           <h4 className="text-xs font-medium tracking-wider ">Assignee</h4>
           <span className="text-xs text-gray-600 truncate">
-            {getTicketAssigneeLabel(ticket, users, ASSIGNEE_DISPLAY_FIELD) || "Unassigned"}
+            {getTicketAssigneeLabel(ticket, users, ASSIGNEE_DISPLAY_FIELD) ||
+              "Unassigned"}
           </span>
         </div>
         <div className="flex flex-col gap-1">
@@ -82,7 +109,6 @@ export default function TicketDetails({
       </div>
 
       <hr />
-
       {/* Meta Grid */}
       <div className="grid grid-cols-4 gap-4 border-gray-100">
         <div className="col-span-1 flex flex-col gap-1.5">
@@ -120,7 +146,7 @@ export default function TicketDetails({
             {ticket.priority}
           </span>
         </div>
-
+        {/* 
         <div className="col-span-2 flex flex-col">
           <TicketWorkflowActions
             ticket={ticket}
@@ -134,7 +160,24 @@ export default function TicketDetails({
             onCloseTicket={onCloseTicket}
             onReopenTicket={onReopenTicket}
           />
+        </div> */}
+      </div>
+
+      <div className="mt-3">
+        <div className="flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => setShowComments((s) => !s)}
+            className="text-sm text-brand-strong hover:underline"
+          >
+            {commentsCount} Comments
+          </button>
         </div>
+        {showComments && (
+          <div className="mt-2">
+            <TicketComments ticketId={ticket.id} profile={profile} />
+          </div>
+        )}
       </div>
     </div>
   );

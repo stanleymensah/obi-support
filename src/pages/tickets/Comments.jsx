@@ -19,7 +19,7 @@ export default function TicketComments({ ticketId, profile }) {
     const q = query(colRef, orderBy("createdAt", "asc"));
 
     const unsub = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       // Directly update the React Query cache!
       queryClient.setQueryData(["comments", ticketId], data);
     });
@@ -35,15 +35,15 @@ export default function TicketComments({ ticketId, profile }) {
   };
 
   return (
-    <div className="flex flex-col h-92">
+    <div className="flex flex-col max-h-60">
       <div className="flex-1 overflow-y-auto p-2 space-y-4">
         {comments?.map((comment) => (
           <div key={comment.id} className="flex flex-col gap-1">
-             <div className="flex items-center gap-1">
-              <span className="text-[10px] font-semibold text-azure-pop">{comment.userName}{comment.userName.role}</span>
-              <span className="text-[9px] text-gray-400">{formatRelativeTime(comment.createdAt)}</span>
+            <div className="flex items-center gap-1">
+              <span className="text-[10px] font-semibold text-brand">{comment.userName}</span>
+              <span className="text-[9px] text-muted-foreground">{formatRelativeTime(comment.createdAt)}</span>
             </div>
-            <div className="bg-gray-100 px-3 py-1 rounded-md rounded-tl-none text-xs text-gray-700 w-fit max-w-[85%]">
+            <div className="bg-muted px-3 py-1 rounded-md rounded-tl-none text-xs text-foreground w-fit max-w-[85%]">
               {comment.text}
             </div>
           </div>
@@ -51,13 +51,13 @@ export default function TicketComments({ ticketId, profile }) {
       </div>
 
       <form onSubmit={handleSend} className="mt-4 flex gap-2 border-t pt-2">
-        <input 
-          value={text} 
+        <input
+          value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Write a message..."
-          className="flex-1 bg-gray-50 border rounded-full px-4 py-1.5 text-xs outline-none"
+          className="flex-1 bg-card border border-border rounded-full px-4 py-1.5 text-xs outline-none"
         />
-        <button className="bg-azure-pop text-white w-8 h-8 rounded-full flex items-center justify-center">
+        <button className="bg-brand text-white w-8 h-8 rounded-full flex items-center justify-center">
           <Send size={14} />
         </button>
       </form>

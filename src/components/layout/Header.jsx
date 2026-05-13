@@ -63,16 +63,19 @@ export default function Header({ showDropdown }) {
           )}
         </div>
 
-        <div className="hidden md:flex flex-col justify-center">
-          <p className="text-base text-gray-700">
+        <div className="hidden md:flex items-center gap-1">
+          {/* <p className="text-base text-gray-700">
             Greetings,{" "}
             <span className="text-azure-dark text-base font-medium">
               {profile?.firstName || "User"}
             </span>
-          </p>
+          </p> */}
+          <img src="/images/help.png" alt="" className="w-6" />
+          <h4 className="text-lg text-azure-dark">Obi Support</h4>
+     
         </div>
 
-        <div className="flex-1" />
+        <div className="hidden md:flex md:flex-1 " />
         <Tooltip>
           <TooltipTrigger>
             <NavLink to="/tickets/assigned" className="hidden md:flex items-center cursor-pointer relative border p-1.5 rounded-full">

@@ -22,7 +22,7 @@ import { useUsers } from "@/hooks/useUsers";
 import { useUpdateTicket } from "@/hooks/useUpdateTicket";
 
 export default function Tickets({ assignedOnly = false }) {
-  const { data: tickets, isLoading, error } = useTickets();
+  const { data: tickets, isLoading, error, refetch: refetchTickets } = useTickets();
   const { data: users } = useUsers();
   const [isCreating, setIsCreating] = useState(false);
   const deleteMutation = useDeleteTicket();
@@ -121,11 +121,12 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
     setSortOrder((current) => (current === "asc" ? "desc" : "asc"));
   };
 
-  const commitWorkflowUpdate = async (updates) => {
-    if (!ticketToView?.id) return;
+  const commitWorkflowUpdate = async (updates, ticketId) => {
+    const idToUpdate = ticketId || ticketToView?.id;
+    if (!idToUpdate) return;
 
     await updateTicketMutation.mutateAsync({
-      ticketId: ticketToView.id,
+      ticketId: idToUpdate,
       updates,
     });
 
@@ -133,6 +134,9 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
     if (Object.prototype.hasOwnProperty.call(updates, "assigneeId")) {
       setWorkflowAssigneeId(updates.assigneeId || "");
     }
+
+    // Refetch tickets to immediately reflect changes in table
+    await refetchTickets();
   };
 
   const handleAssignAssignee = async () => {
@@ -233,9 +237,11 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
               onEdit={handleEdit}
               onView={handleView}
               onComment={handleComment}
+              onUpdate={commitWorkflowUpdate}
               profile={profile}
               sortOrder={sortOrder}
               onToggleSort={handleToggleSort}
+              users={users || []}
             />
           </div>
           <div className="bg-gray-50/30 shrink-0">
@@ -279,18 +285,19 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
             const canManageTickets = isAdmin || isAssigned;
 
             return (
-              <TicketDetails
-                ticket={ticketToView}
-                users={users || []}
-                effectiveAssignee={workflowAssigneeId}
-                canManageTickets={canManageTickets}
-                onAssigneeChange={setWorkflowAssigneeId}
-                onAssign={handleAssignAssignee}
-                onStartWork={handleStartWork}
-                onMarkResolved={handleMarkResolved}
-                onCloseTicket={handleCloseTicket}
-                onReopenTicket={handleReopenTicket}
-              />
+                <TicketDetails
+                  ticket={ticketToView}
+                  users={users || []}
+                  profile={profile}
+                  effectiveAssignee={workflowAssigneeId}
+                  canManageTickets={canManageTickets}
+                  onAssigneeChange={setWorkflowAssigneeId}
+                  onAssign={handleAssignAssignee}
+                  onStartWork={handleStartWork}
+                  onMarkResolved={handleMarkResolved}
+                  onCloseTicket={handleCloseTicket}
+                  onReopenTicket={handleReopenTicket}
+                />
             );
           })()}
         </Modal>

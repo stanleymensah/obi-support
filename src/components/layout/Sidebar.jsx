@@ -6,16 +6,16 @@ export default function Sidebar() {
   const { profile } = useAuth();
   return (
     <>
-      <div className="border rounded-sm flex flex-col gap-4 w-full h-full border-black/10 px-2 bg-white shadow-sm inset-shadow-sm inset-shadow-azure-pop/10">
-        <div className="top flex items-center gap-1 w-full justify-center h-12">
-          <img src="/images/help.png" alt="" className="w-4" />
-          <h4 className="text-azure-dark">Obi Support</h4>
-        </div>
+      <div className="border rounded-sm flex flex-col gap-4 w-full h-full border-black/10 bg-azure-pop/20 text-black shadow-sm inset-shadow-sm inset-shadow-azure-pop/10">
+        {/* <div className="top flex items-center gap-1 w-full justify-center h-12">
+          <img src="/images/obi-white.png" alt="" className="w-4" />
+          <h4 className="text-white">Obi Support</h4>
+        </div> */}
 
-        <div className="links-container flex flex-col gap-3">
-          <span className="uppercase text-xs">menu</span>
+        <div className="links-container flex flex-col gap-6 pt-3">
+          <span className="uppercase text-sm w-full text-center">menu</span>
 
-          <div className="links w-full flex flex-col gap-2">
+          <div className="links w-full flex flex-col gap-1 px-1">
             <NavLink
               to="/dashboard"
               className={({ isActive }) => (isActive ? "link-active" : "link")}

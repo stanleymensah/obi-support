@@ -12,17 +12,9 @@ import {
   ArrowUp,
   SquarePen,
   Trash2,
-  MessageCircleMore,
 } from "lucide-react";
 import { formatRelativeTime } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-
-const statusColors = {
-  open: "bg-blue-100 text-blue-700 border-blue-200",
-  "in-progress": "bg-yellow-100 text-yellow-700 border-yellow-200",
-  resolved: "bg-green-100 text-green-700 border-green-200",
-  closed: "bg-gray-100 text-gray-700 border-gray-100",
-};
 
 const priorityVariants = {
   low: "secondary", // Muted gray/neutral
@@ -31,16 +23,50 @@ const priorityVariants = {
   urgent: "destructive", // Red (high attention)
 };
 
+import { useState } from "react";
+import Modal from "@/components/common/Modal";
+
 export default function TicketsTable({
   tickets,
-  onComment,
   onDelete,
   onEdit,
   onView,
+  onUpdate,
   profile,
   sortOrder,
   onToggleSort,
+  users = [],
 }) {
+  const [openMenuFor, setOpenMenuFor] = useState(null);
+  const [assignmentModal, setAssignmentModal] = useState({ open: false, ticketId: null });
+
+  // Define valid state transitions based on ticket workflow
+  // Statuses: open, assigned, in-progress, resolved, closed, reopened
+  // Transitions:
+  //   open → assigned
+  //   assigned → in-progress
+  //   in-progress → resolved
+  //   resolved → closed | reopened
+  //   reopened → in-progress
+  //   closed → (terminal state)
+  const getValidTransitions = (currentStatus) => {
+    const normalized = String(currentStatus || "closed")
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "-");
+
+    const transitions = {
+      open: ["assigned"],
+      assigned: ["in-progress"],
+      "in-progress": ["resolved"],
+      resolved: ["closed", "reopened"],
+      reopened: ["in-progress"],
+      closed: [], // Terminal state — no transitions allowed
+    };
+
+    return transitions[normalized] || [];
+  };
+
   const getDisplayNumber = (ticket) => {
     if (ticket.ticketNumber) return ticket.ticketNumber;
     if (ticket.id) {
@@ -56,8 +82,38 @@ export default function TicketsTable({
     return "000";
   };
 
+  const handleAssignUser = (userId) => {
+    if (onUpdate) {
+      onUpdate({ status: "assigned", assigneeId: userId }, assignmentModal.ticketId);
+    }
+    setAssignmentModal({ open: false, ticketId: null });
+  };
+
   return (
     <>
+      {assignmentModal.open && (
+        <Modal
+          isOpen={assignmentModal.open}
+          onClose={() => setAssignmentModal({ open: false, ticketId: null })}
+          title="Assign Ticket"
+        >
+          <div className="space-y-2">
+            {users.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No users available</p>
+            ) : (
+              users.map((user) => (
+                <button
+                  key={user.id}
+                  onClick={() => handleAssignUser(user.id)}
+                  className="w-full text-left px-4 py-2 rounded-sm hover:bg-muted transition-colors text-sm"
+                >
+                  {user.displayName || user.email}
+                </button>
+              ))
+            )}
+          </div>
+        </Modal>
+      )}
       <Table>
         {tickets.length === 0 && <TableCaption>No tickets found!</TableCaption>}
         <TableHeader>
@@ -111,23 +167,62 @@ export default function TicketsTable({
                 </Badge>
               </TableCell>
               <TableCell className="text-center py-2 hidden md:table-cell">
-                <Badge
-                  className={`${statusColors[ticket.status?.toLowerCase()] || "bg-gray-100"} capitalize font-medium`}
-                  variant="outline"
-                >
-                  {ticket.status}
-                </Badge>
+                <div className="relative inline-block">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (getValidTransitions(ticket.status).length > 0) {
+                        setOpenMenuFor(openMenuFor === ticket.id ? null : ticket.id);
+                      }
+                    }}
+                    disabled={getValidTransitions(ticket.status).length === 0}
+                    className="inline-flex items-center gap-1 hover:text-brand disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Badge className="capitalize">
+                      {ticket.status?.replace(/-/g, " ")}
+                    </Badge>
+                    {openMenuFor === ticket.id ? (
+                      <ArrowUp size={14} />
+                    ) : (
+                      <ArrowDown size={14} />
+                    )}
+                  </button>
+
+                  {openMenuFor === ticket.id && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute right-0 mt-1 w-32 rounded-sm bg-card border border-border shadow-sm z-50"
+                    >
+                      <ul className="py-0.5">
+                        {getValidTransitions(ticket.status).map((opt) => (
+                          <li key={opt}>
+                            <button
+                              className="w-full text-left px-2 py-1 text-xs hover:bg-muted"
+                              onClick={() => {
+                                if (opt === "assigned") {
+                                  setOpenMenuFor(null);
+                                  setAssignmentModal({ open: true, ticketId: ticket.id });
+                                } else {
+                                  setOpenMenuFor(null);
+                                  if (onUpdate) onUpdate({ status: opt }, ticket.id);
+                                }
+                              }}
+                            >
+                              {opt.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase())}
+                            </button>
+                          </li>
+                        ))}
+                        {getValidTransitions(ticket.status).length === 0 && (
+                          <li className="px-2 py-1 text-xs text-muted-foreground">
+                            No actions available
+                          </li>
+                        )}
+                      </ul>
+                    </div>
+                  )}
+                </div>
               </TableCell>
               <TableCell className="text-right py-6 md:py-2 flex items-center justify-end gap-1 space-x-1">
-                <button
-                  className="text-gray-600"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onComment(ticket);
-                  }}
-                >
-                  <MessageCircleMore size={16} />{" "}
-                </button>
                 {profile?.role === "admin" ? (
                   <>
                     <button

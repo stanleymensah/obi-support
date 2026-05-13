@@ -9,7 +9,7 @@ export default function Pagination({ pagination }) {
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex flex-col md:flex-row items-center justify-between gap-3 px-4 py-2 bg-white border-t border-gray-100">
+    <div className="flex flex-col md:flex-row items-center justify-between gap-3 px-4 py-1 bg-white border-t border-gray-100">
       <div className="text-xs text-gray-500 order-2 md:order-1">
         Page <span className="font-bold text-gray-700">{currentPage}</span> of <span className="font-bold text-gray-700">{totalPages}</span>
       </div>
@@ -19,7 +19,7 @@ export default function Pagination({ pagination }) {
         <button
           onClick={goToFirstPage}
           disabled={!hasPrevPage}
-          className="p-2 md:p-2 h-10 md:h-auto rounded-full hover:bg-gray-100 disabled:opacity-30 transition-colors flex items-center justify-center"
+          className="p-2 md:p-2 h-6 md:h-auto rounded-full hover:bg-gray-100 disabled:opacity-30 transition-colors flex items-center justify-center"
           title="First page"
         >
           <ChevronsLeft size={18} />
@@ -29,7 +29,7 @@ export default function Pagination({ pagination }) {
         <button
           onClick={prevPage}
           disabled={!hasPrevPage}
-          className="hidden sm:flex items-center gap-1 px-3 py-2 rounded-full text-xs font-medium hover:bg-gray-100 disabled:opacity-30 transition-colors h-10"
+          className="hidden sm:flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium hover:bg-gray-100 disabled:opacity-30 transition-colors h-6"
         >
           <ChevronLeft size={14} /> Previous
         </button>
@@ -38,7 +38,7 @@ export default function Pagination({ pagination }) {
         <button
           onClick={prevPage}
           disabled={!hasPrevPage}
-          className="sm:hidden p-2 rounded-full hover:bg-gray-100 disabled:opacity-30 transition-colors h-10 w-10 flex items-center justify-center"
+          className="sm:hidden p-2 rounded-full hover:bg-gray-100 disabled:opacity-30 transition-colors h-6 w-10 flex items-center justify-center"
           title="Previous"
         >
           <ChevronLeft size={16} />
@@ -72,7 +72,7 @@ export default function Pagination({ pagination }) {
         <button
           onClick={nextPage}
           disabled={!hasNextPage}
-          className="sm:hidden p-2 rounded-full hover:bg-gray-100 disabled:opacity-30 transition-colors h-10 w-10 flex items-center justify-center"
+          className="sm:hidden p-2 rounded-full hover:bg-gray-100 disabled:opacity-30 transition-colors h-6 w-10 flex items-center justify-center"
           title="Next"
         >
           <ChevronRight size={16} />
@@ -82,7 +82,7 @@ export default function Pagination({ pagination }) {
         <button
           onClick={nextPage}
           disabled={!hasNextPage}
-          className="hidden sm:flex items-center gap-1 px-3 py-2 rounded-full text-xs font-medium hover:bg-gray-100 disabled:opacity-30 transition-colors h-10"
+          className="hidden sm:flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium hover:bg-gray-100 disabled:opacity-30 transition-colors h-6"
         >
           Next <ChevronRight size={14} />
         </button>
@@ -91,7 +91,7 @@ export default function Pagination({ pagination }) {
         <button
           onClick={goToLastPage}
           disabled={!hasNextPage}
-          className="p-2 md:p-2 h-10 md:h-auto rounded-full hover:bg-gray-100 disabled:opacity-30 transition-colors flex items-center justify-center"
+          className="p-2 md:p-2 h-6 md:h-auto rounded-full hover:bg-gray-100 disabled:opacity-30 transition-colors flex items-center justify-center"
           title="Last page"
         >
           <ChevronsRight size={18} />
