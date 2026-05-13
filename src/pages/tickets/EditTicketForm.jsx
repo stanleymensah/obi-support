@@ -5,23 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/context/AuthContext";
 import Spinner from "@/components/ui/spinner";
 import { useUsers } from "@/hooks/useUsers";
-
-const getUserDisplayName = (user) => {
-  if (typeof user === "string") {
-    return user.trim();
-  }
-
-  return (
-    user?.fullName ??
-    user?.name ??
-    `${user?.firstName || ""} ${user?.lastName || ""}`.trim() ??
-    user?.username ??
-    user?.email ??
-    ""
-  )
-    .toString()
-    .trim();
-};
+import { ASSIGNEE_DISPLAY_FIELD, buildAssigneePayload, findUserByAssigneeValue, getUserDisplayLabel } from "@/lib/assignee";
 
 export default function EditTicketForm({ onClose, ticket }) {
   const { user, profile } = useAuth();
@@ -41,7 +25,7 @@ export default function EditTicketForm({ onClose, ticket }) {
     defaultValues: {
       title: ticket.title || "",
       email: ticket?.email || "",
-      assignee: ticket.assignee || "",
+      assigneeId: ticket.assigneeId || findUserByAssigneeValue(users, ticket.assignee)?.id || "",
       description: ticket.description || "",
       status: ticket.status || "Open",
     },
@@ -74,7 +58,11 @@ export default function EditTicketForm({ onClose, ticket }) {
   });
 
   const onSubmit = (data) => {
-    mutation.mutate(data);
+    const selectedUser = findUserByAssigneeValue(users, data.assigneeId);
+    mutation.mutate({
+      ...data,
+      ...buildAssigneePayload(selectedUser, ASSIGNEE_DISPLAY_FIELD),
+    });
   };
 
   return (
@@ -149,15 +137,15 @@ export default function EditTicketForm({ onClose, ticket }) {
             </label>
             <div className="border py-1.5 px-3 rounded-sm flex items-center">
               <select
-                {...register("assignee")}
+                {...register("assigneeId")}
                 className="text-xs w-full bg-transparent outline-none"
-                defaultValue={ticket.assignee || ""}
+                defaultValue={ticket.assigneeId || findUserByAssigneeValue(users, ticket.assignee)?.id || ""}
               >
                 <option value="">Select user</option>
                 {assignableUsers.map((u) => {
-                  const displayName = getUserDisplayName(u);
+                  const displayName = getUserDisplayLabel(u, ASSIGNEE_DISPLAY_FIELD);
                   return (
-                    <option key={u.id || displayName} value={displayName}>
+                    <option key={u.id || displayName} value={u.id}>
                       {displayName}
                     </option>
                   );

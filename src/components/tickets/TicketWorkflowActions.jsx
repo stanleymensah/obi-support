@@ -2,25 +2,10 @@ import { useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { ASSIGNEE_DISPLAY_FIELD, getUserDisplayLabel } from "@/lib/assignee";
 
 const normalizeStatus = (status) =>
   String(status ?? "closed").trim().toLowerCase().replace(/\s+/g, "-");
-
-const getUserDisplayName = (user) => {
-  if (typeof user === "string") {
-    return user.trim();
-  }
-
-  return (
-    user?.fullName ??
-    user?.name ??
-    user?.username ??
-    user?.email ??
-    ""
-  )
-    .toString()
-    .trim();
-};
 
 const isAssignableUser = (user) => {
   const role = String(user?.role || "").toLowerCase();
@@ -42,8 +27,11 @@ export default function TicketWorkflowActions({
   const availableUsers = useMemo(() => {
     return users
       .filter(isAssignableUser)
-      .map(getUserDisplayName)
-      .filter(Boolean);
+      .map((user) => ({
+        id: user?.id || "",
+        label: getUserDisplayLabel(user, ASSIGNEE_DISPLAY_FIELD),
+      }))
+      .filter((user) => user.id && user.label);
   }, [users]);
 
   const status = normalizeStatus(ticket?.status);
@@ -80,9 +68,9 @@ export default function TicketWorkflowActions({
                 )}
               >
                 <option value="">Select user</option>
-                {availableUsers.map((name) => (
-                  <option key={name} value={name}>
-                    {name}
+                {availableUsers.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.label}
                   </option>
                 ))}
               </select>

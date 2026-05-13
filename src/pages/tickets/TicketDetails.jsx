@@ -1,5 +1,6 @@
 import TicketWorkflowActions from "@/components/tickets/TicketWorkflowActions";
 import { formatDate } from "@/lib/utils";
+import { ASSIGNEE_DISPLAY_FIELD, getTicketAssigneeLabel } from "@/lib/assignee";
 
 const normalizeStatus = (status) =>
   String(status ?? "closed")
@@ -69,7 +70,7 @@ export default function TicketDetails({
         <div className="flex flex-col gap-1">
           <h4 className="text-xs font-medium tracking-wider ">Assignee</h4>
           <span className="text-xs text-gray-600 truncate">
-            {ticket.assignee || "Unassigned"}
+            {getTicketAssigneeLabel(ticket, users, ASSIGNEE_DISPLAY_FIELD) || "Unassigned"}
           </span>
         </div>
         <div className="flex flex-col gap-1">

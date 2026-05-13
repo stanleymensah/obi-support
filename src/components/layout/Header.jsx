@@ -1,5 +1,6 @@
 import { useAuth } from "@/context/AuthContext";
 import { ChevronDown, Ticket, LayoutGrid, UserRoundCog, PanelBottomClose } from "lucide-react";
+import { isTicketAssignedToProfile } from "@/lib/assignee";
 import { NavLink } from "react-router-dom";
 import { useMemo } from "react";
 import { useTickets } from "@/hooks/useTickets";
@@ -18,18 +19,8 @@ export default function Header({ showDropdown }) {
   const assignedCount = useMemo(() => {
     if (!profile) return 0;
 
-    const userIdentifiers = [
-      String(profile.email).toLowerCase(),
-      `${profile.firstName || ""} ${profile.lastName || ""}`
-        .trim()
-        .toLowerCase(),
-    ].filter(Boolean);
-
-    return tickets.filter((t) => {
-      const assignee = String(t.assignee || "").toLowerCase();
-      return userIdentifiers.some((id) => id === assignee);
-    }).length;
-  }, [tickets, profile]);
+    return tickets.filter((ticket) => isTicketAssignedToProfile(ticket, profile, user?.uid)).length;
+  }, [tickets, profile, user?.uid]);
 
   return (
     <>

@@ -13,6 +13,7 @@ import TicketComments from "./Comments";
 import { useAuth } from "@/context/AuthContext";
 import { useMemo } from "react";
 import { sortByCreatedAt } from "@/lib/utils";
+import { buildAssigneePayload, isTicketAssignedToProfile } from "@/lib/assignee";
 import Spinner from "@/components/ui/spinner";
 import usePagination from "@/hooks/usePagination";
 import { useTicketFilters } from "@/hooks/useTicketFilters";
@@ -32,11 +33,11 @@ export default function Tickets({ assignedOnly = false }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isViewing, setIsViewing] = useState(false);
   const [ticketToView, setTicketToView] = useState(null);
-  const [workflowAssignee, setWorkflowAssignee] = useState("");
+  const [workflowAssigneeId, setWorkflowAssigneeId] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [isComment, setIsComment] = useState(false);
   const [commentTicket, setCommentTicket] = useState(null);
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
   const [sortOrder, setSortOrder] = useState("asc");
   const [confirmText, setConfirmText] = useState("");
 const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
@@ -46,21 +47,11 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
 
   const baseTickets = useMemo(() => {
     if (assignedOnly && profile) {
-      const userIdentifiers = [
-        String(profile.email || "").toLowerCase(),
-        `${profile.firstName || ""} ${profile.lastName || ""}`
-          .trim()
-          .toLowerCase(),
-      ].filter(Boolean);
-
-      return (tickets || []).filter((t) => {
-        const assignee = String(t.assignee || "").toLowerCase();
-        return userIdentifiers.some((id) => id === assignee);
-      });
+      return (tickets || []).filter((t) => isTicketAssignedToProfile(t, profile, user?.uid));
     }
 
     return tickets || [];
-  }, [tickets, profile, assignedOnly]);
+  }, [tickets, profile, user?.uid, assignedOnly]);
 
   const sortedTickets = useMemo(() => {
     return sortByCreatedAt(baseTickets || [], sortOrder);
@@ -87,14 +78,14 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
 
   const handleView = (ticket) => {
     setTicketToView(ticket);
-    setWorkflowAssignee(ticket.assignee || "");
+    setWorkflowAssigneeId(ticket.assigneeId || ticket.assignee || "");
     setIsViewing(true);
   };
 
   const handleCloseView = () => {
     setTicketToView(null);
     setIsViewing(false);
-    setWorkflowAssignee("");
+    setWorkflowAssigneeId("");
   };
 
   const handleDelete = (ticketId) => {
@@ -139,14 +130,15 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
     });
 
     setTicketToView((current) => (current ? { ...current, ...updates } : current));
-    if (Object.prototype.hasOwnProperty.call(updates, "assignee")) {
-      setWorkflowAssignee(updates.assignee || "");
+    if (Object.prototype.hasOwnProperty.call(updates, "assigneeId")) {
+      setWorkflowAssigneeId(updates.assigneeId || "");
     }
   };
 
   const handleAssignAssignee = async () => {
+    const selectedUser = (users || []).find((candidate) => candidate?.id === workflowAssigneeId);
     await commitWorkflowUpdate({
-      assignee: workflowAssignee,
+      ...buildAssigneePayload(selectedUser),
       status: "Assigned",
     });
   };
@@ -283,19 +275,16 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
           {(() => {
             // Only allow workflow actions if user is admin or assigned to the ticket
             const isAdmin = profile?.role === "admin";
-            const isAssigned = ticketToView?.assignee && (
-              String(ticketToView.assignee).toLowerCase() === String(profile?.email || "").toLowerCase() ||
-              String(ticketToView.assignee).toLowerCase() === `${profile?.firstName || ""} ${profile?.lastName || ""}`.trim().toLowerCase()
-            );
+            const isAssigned = isTicketAssignedToProfile(ticketToView, profile, user?.uid);
             const canManageTickets = isAdmin || isAssigned;
 
             return (
               <TicketDetails
                 ticket={ticketToView}
                 users={users || []}
-                effectiveAssignee={workflowAssignee}
+                effectiveAssignee={workflowAssigneeId}
                 canManageTickets={canManageTickets}
-                onAssigneeChange={setWorkflowAssignee}
+                onAssigneeChange={setWorkflowAssigneeId}
                 onAssign={handleAssignAssignee}
                 onStartWork={handleStartWork}
                 onMarkResolved={handleMarkResolved}

@@ -6,23 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import Spinner from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { useUsers } from "@/hooks/useUsers";
-
-const getUserDisplayName = (user) => {
-  if (typeof user === "string") {
-    return user.trim();
-  }
-
-  return (
-    user?.fullName ??
-    user?.name ??
-    `${user?.firstName || ""} ${user?.lastName || ""}`.trim() ??
-    user?.username ??
-    user?.email ??
-    ""
-  )
-    .toString()
-    .trim();
-};
+import { ASSIGNEE_DISPLAY_FIELD, buildAssigneePayload, getUserDisplayLabel, findUserByAssigneeValue } from "@/lib/assignee";
 
 export default function CreateTicketForm({ onClose }) {
   const { user, profile } = useAuth();
@@ -50,7 +34,7 @@ export default function CreateTicketForm({ onClose }) {
       title: "",
       email: "",
       priority: "",
-      assignee: "",
+      assigneeId: "",
       description: "",
     },
   });
@@ -98,7 +82,11 @@ export default function CreateTicketForm({ onClose }) {
   });
 
   const onSubmit = (data) => {
-    mutation.mutate(data);
+    const selectedUser = findUserByAssigneeValue(users, data.assigneeId);
+    mutation.mutate({
+      ...data,
+      ...buildAssigneePayload(selectedUser, ASSIGNEE_DISPLAY_FIELD),
+    });
     // keep UI behavior: pretend to submit then close
     console.log("Create ticket:", data);
     // if (onClose) onClose();
@@ -184,15 +172,15 @@ export default function CreateTicketForm({ onClose }) {
                   </label>
                   <div className="border py-1.5 px-3 rounded-sm flex items-center">
                     <select
-                      {...register("assignee")}
+                      {...register("assigneeId")}
                       className="text-xs w-full bg-transparent outline-none"
                       defaultValue=""
                     >
                       <option value="">Select user</option>
                       {assignableUsers.map((u) => {
-                        const displayName = getUserDisplayName(u);
+                        const displayName = getUserDisplayLabel(u, ASSIGNEE_DISPLAY_FIELD);
                         return (
-                          <option key={u.id || displayName} value={displayName}>
+                          <option key={u.id || displayName} value={u.id}>
                             {displayName}
                           </option>
                         );
