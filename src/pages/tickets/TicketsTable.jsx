@@ -23,7 +23,7 @@ const priorityVariants = {
   urgent: "destructive", // Red (high attention)
 };
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Modal from "@/components/common/Modal";
 
 export default function TicketsTable({
@@ -38,17 +38,27 @@ export default function TicketsTable({
   users = [],
 }) {
   const [openMenuFor, setOpenMenuFor] = useState(null);
+  const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
   const [assignmentModal, setAssignmentModal] = useState({ open: false, ticketId: null });
+  const actionMenuRef = useRef(null);
 
-  // Define valid state transitions based on ticket workflow
-  // Statuses: open, assigned, in-progress, resolved, closed, reopened
-  // Transitions:
-  //   open → assigned
-  //   assigned → in-progress
-  //   in-progress → resolved
-  //   resolved → closed | reopened
-  //   reopened → in-progress
-  //   closed → (terminal state)
+  useEffect(() => {
+    if (!openMenuFor) return;
+
+    const handlePointerDown = (event) => {
+      if (actionMenuRef.current && !actionMenuRef.current.contains(event.target)) {
+        setOpenMenuFor(null);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, [openMenuFor]);
+  
+
   const getValidTransitions = (currentStatus) => {
     const normalized = String(currentStatus || "closed")
       .trim()
@@ -167,11 +177,13 @@ export default function TicketsTable({
                 </Badge>
               </TableCell>
               <TableCell className="text-center py-2 hidden md:table-cell">
-                <div className="relative inline-block">
+                <div ref={actionMenuRef} className="relative inline-block">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       if (getValidTransitions(ticket.status).length > 0) {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        setMenuPos({ top: rect.bottom + window.scrollY, left: rect.left + window.scrollX });
                         setOpenMenuFor(openMenuFor === ticket.id ? null : ticket.id);
                       }
                     }}
@@ -191,7 +203,8 @@ export default function TicketsTable({
                   {openMenuFor === ticket.id && (
                     <div
                       onClick={(e) => e.stopPropagation()}
-                      className="absolute right-0 mt-1 w-32 rounded-sm bg-card border border-border shadow-sm z-50"
+                      style={{ position: "fixed", top: `${menuPos.top}px`, left: `${menuPos.left}px`, minWidth: 128 }}
+                      className="rounded-sm bg-card border border-border shadow-sm z-50"
                     >
                       <ul className="py-0.5">
                         {getValidTransitions(ticket.status).map((opt) => (

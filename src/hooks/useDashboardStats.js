@@ -16,7 +16,7 @@ export function useDashboardStats() {
       return assignee !== "" && status === "assigned";
     }).length;
     const inProgress = allTickets.filter(
-      (t) => t.status === "In Progress",
+      (t) => t.status === "in-progress",
     ).length;
     const high = allTickets.filter((t) => t.priority === "High").length;
     const medium = allTickets.filter((t) => t.priority === "Medium").length;

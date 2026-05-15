@@ -47,7 +47,7 @@ export default function CreateTicketForm({ onClose }) {
         ...newTicket,
         userId: user.uid,
         createdBy: `${profile.firstName} ${profile.lastName}`,
-        status: "Open",
+        status: newTicket.assigneeId ? "Assigned" : "Open",
         createdAt: serverTimestamp(),
       });
     },

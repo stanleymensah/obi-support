@@ -162,7 +162,7 @@ export default function Users() {
       )}
 
       {isViewing && (
-        <Modal size="sm" title={userToView.title} onClose={handleCloseView}>
+        <Modal size="sm" title="User Details" onClose={handleCloseView}>
           <UserDetails user={userToView} />
         </Modal>
       )}

@@ -83,6 +83,12 @@ export default function TicketDetails({
     <div className="flex flex-col gap-3 p-1">
       {/* Description Section */}
       <div className="flex flex-col gap-2">
+        <h4 className="text-xs font-medium  tracking-wider ">Title</h4>
+        <div className="w-full bg-gray-50/50 border border-gray-100 p-2 rounded-sm text-xs min-w-92 text-gray-700 leading-relaxed shadow-inner">
+          {ticket.title || "No title provided."}
+        </div>
+      </div>
+      <div className="flex flex-col gap-2">
         <h4 className="text-xs font-medium  tracking-wider ">Description</h4>
         <div className="w-full bg-gray-50/50 border border-gray-100 p-2 rounded-sm text-xs h-20 min-w-92 text-gray-700 leading-relaxed shadow-inner">
           {ticket.description || "No description provided."}
