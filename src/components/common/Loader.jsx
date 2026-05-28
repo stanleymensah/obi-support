@@ -1,7 +1,3 @@
-
-
 export default function Loader() {
-  return (
-    <div>Loader</div>
-  )
+  return <div className="text-sm text-gray-500">Loading…</div>;
 }

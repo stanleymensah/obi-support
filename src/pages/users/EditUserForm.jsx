@@ -1,8 +1,7 @@
 import { useForm } from "react-hook-form";
-import { db } from "@/lib/firebase";
-import { doc, updateDoc, collection, getDocs, query, orderBy } from "firebase/firestore";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Spinner from "@/components/ui/spinner";
+import { supabase } from "@/utils/supabase";
 
 export default function EditUserForm({ onClose, userToEdit }) {
   const queryClient = useQueryClient();
@@ -22,21 +21,39 @@ export default function EditUserForm({ onClose, userToEdit }) {
 
   const mutation = useMutation({
     mutationFn: async (updatedData) => {
-      // Points to the specific USER document using their ID
-      const userRef = doc(db, "users", userToEdit.id);
-      return await updateDoc(userRef, updatedData);
+      const payload = {
+        first_name: updatedData.firstName,
+        last_name: updatedData.lastName,
+        role: updatedData.role,
+      };
+
+      const { error } = await supabase.from("users").eq("id", userToEdit.id).update(payload);
+      if (error) throw error;
+
+      return payload;
     },
     onSuccess: () => {
       (async () => {
         try {
-          const usersRef = collection(db, "users");
-          const q = query(usersRef, orderBy("createdAt", "desc"));
-          const snapshot = await getDocs(q);
-          const users = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+          const { data, error } = await supabase
+            .from("users")
+            .order("created_at", { ascending: false })
+            .select("*");
+
+          if (error) throw error;
+
+          const users = (data || []).map((row) => ({
+            ...row,
+            firstName: row.first_name,
+            lastName: row.last_name,
+            photoURL: row.photo_url,
+            createdAt: row.created_at,
+          }));
+
           queryClient.setQueryData(["users"], users);
         } catch (e) {
           queryClient.invalidateQueries({ queryKey: ["users"] });
-          console.log(e.message)
+            console.error(e.message);
         }
       })();
       if (onClose) onClose();

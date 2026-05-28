@@ -1,7 +1,3 @@
-
-
 export default function UserSub() {
-  return (
-    <div>UserSub</div>
-  )
+  return <div>UserSub</div>;
 }

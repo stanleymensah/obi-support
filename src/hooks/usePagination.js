@@ -9,7 +9,7 @@ export default function usePagination(items, itemsPerPage = 10) {
 
   const totalPages = Math.ceil(items.length / itemsPerPage) || 1;
   const goToFirstPage = () => setCurrentPage(1);
-const goToLastPage = () => setCurrentPage(totalPages);
+  const goToLastPage = () => setCurrentPage(totalPages);
 
   const currentItems = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -36,8 +36,8 @@ const goToLastPage = () => setCurrentPage(totalPages);
     nextPage,
     prevPage,
     goToPage,
-      goToFirstPage,
-  goToLastPage,
+    goToFirstPage,
+    goToLastPage,
     hasNextPage: currentPage < totalPages,
     hasPrevPage: currentPage > 1,
   };

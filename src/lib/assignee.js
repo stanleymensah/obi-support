@@ -14,7 +14,9 @@ export const getUserDisplayLabel = (user, displayField = ASSIGNEE_DISPLAY_FIELD)
     return user.trim();
   }
 
-  const fullName = `${user?.firstName || ""} ${user?.lastName || ""}`.trim();
+  const firstName = user?.firstName || user?.first_name || "";
+  const lastName = user?.lastName || user?.last_name || "";
+  const fullName = `${firstName} ${lastName}`.trim();
 
   const fieldMap = {
     fullName: user?.fullName || fullName,
@@ -37,7 +39,9 @@ export const findUserByAssigneeValue = (users = [], assigneeValue = "") => {
 
   return (
     users.find((user) => {
-      const fullName = `${user?.firstName || ""} ${user?.lastName || ""}`.trim();
+      const firstName = user?.firstName || user?.first_name || "";
+      const lastName = user?.lastName || user?.last_name || "";
+      const fullName = `${firstName} ${lastName}`.trim();
       const candidates = [
         user?.id,
         user?.email,
@@ -88,10 +92,11 @@ export const isTicketAssignedToProfile = (ticket, profile, userId) => {
   const profileIdentifiers = [
     userId,
     profile?.uid,
+    profile?.id,
     profile?.email,
     profile?.username,
     profile?.fullName,
-    `${profile?.firstName || ""} ${profile?.lastName || ""}`.trim(),
+    `${profile?.firstName || profile?.first_name || ""} ${profile?.lastName || profile?.last_name || ""}`.trim(),
   ]
     .map(normalizeText)
     .filter(Boolean);

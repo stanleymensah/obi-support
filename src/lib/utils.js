@@ -1,6 +1,6 @@
-import { clsx } from "clsx";
+import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from "date-fns";
 
 export function cn(...inputs) {
   return twMerge(clsx(inputs));
@@ -23,7 +23,15 @@ export const formatDate = (timestamp) => {
 
 export const formatRelativeTime = (timestamp) => {
   if (!timestamp) return "";
-  return formatDistanceToNow(timestamp.toDate(), { addSuffix: true });
+
+  const date =
+    typeof timestamp?.toDate === "function"
+      ? timestamp.toDate()
+      : new Date(timestamp);
+
+  if (Number.isNaN(date.getTime())) return "";
+
+  return formatDistanceToNow(date, { addSuffix: true });
 };
 // Result: "5 minutes ago" or "2 days ago"
 

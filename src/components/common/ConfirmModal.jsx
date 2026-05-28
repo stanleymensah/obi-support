@@ -1,5 +1,5 @@
-import Modal from "./Modal"
-import { useState, useMemo } from "react"
+import Modal from "./Modal";
+import { useState, useMemo } from "react";
 
 function shortenId(id = "") {
   return id.toString().slice(0, 7);

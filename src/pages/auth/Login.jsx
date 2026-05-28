@@ -1,9 +1,10 @@
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/lib/firebase";
 import Spinner from "@/components/ui/spinner";
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 export default function Login() {
   const [loginError, setLoginError] = useState("");
@@ -17,12 +18,32 @@ export default function Login() {
   const onSubmit = async (data) => {
     setLoginError("");
     try {
-      await signInWithEmailAndPassword(auth, data.logEmail, data.logPassword);
+      const response = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: supabaseKey,
+          Authorization: `Bearer ${supabaseKey}`,
+        },
+        body: JSON.stringify({
+          email: data.logEmail,
+          password: data.logPassword,
+        }),
+      });
+
+      const authData = await response.json();
+      if (!response.ok || !authData?.user) {
+        throw new Error(authData?.error_description || "Invalid email or password.");
+      }
+
+      localStorage.setItem("supabase_access_token", authData.access_token || "");
+      localStorage.setItem("supabase_user", JSON.stringify(authData.user));
+      window.dispatchEvent(new Event("auth-changed"));
       navigate("/dashboard");
     } catch (error) {
       // Friendly error messages
       setLoginError("Invalid email or password. Please try again.");
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -76,7 +97,13 @@ export default function Login() {
           disabled={isSubmitting}
           className="text-white bg-azure-pop py-3 w-full rounded-lg font-semibold mt-4 flex items-center justify-center"
         >
-          {isSubmitting ? <>Logging in <Spinner /> </> : "Login"}
+          {isSubmitting ? (
+            <>
+              Logging in <Spinner />
+            </>
+          ) : (
+            "Login"
+          )}
         </button>
       </form>
     </div>

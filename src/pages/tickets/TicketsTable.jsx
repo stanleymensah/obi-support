@@ -17,10 +17,9 @@ import { formatRelativeTime } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
 const priorityVariants = {
-  low: "secondary", // Muted gray/neutral
-  medium: "default", // Primary brand color
-  high: "outline", // Border only (subtle but distinct)
-  urgent: "destructive", // Red (high attention)
+  low: "outline",
+  medium: "default", 
+  high: "destructive", 
 };
 
 import { useEffect, useRef, useState } from "react";
@@ -94,7 +93,8 @@ export default function TicketsTable({
 
   const handleAssignUser = (userId) => {
     if (onUpdate) {
-      onUpdate({ status: "assigned", assigneeId: userId }, assignmentModal.ticketId);
+      // Store status in Title Case (consistent with other flows)
+      onUpdate({ status: "Assigned", assigneeId: userId }, assignmentModal.ticketId);
     }
     setAssignmentModal({ open: false, ticketId: null });
   };
@@ -165,7 +165,6 @@ export default function TicketsTable({
                 {formatRelativeTime(ticket.createdAt)}
               </TableCell>
               <TableCell className="py-2 text-center">
-                {" "}
                 <Badge
                   variant={
                     priorityVariants[ticket.priority?.toLowerCase()] ||
@@ -215,9 +214,14 @@ export default function TicketsTable({
                                 if (opt === "assigned") {
                                   setOpenMenuFor(null);
                                   setAssignmentModal({ open: true, ticketId: ticket.id });
-                                } else {
+                                  } else {
                                   setOpenMenuFor(null);
-                                  if (onUpdate) onUpdate({ status: opt }, ticket.id);
+                                  if (onUpdate) {
+                                    const label = opt
+                                      .replace(/-/g, " ")
+                                      .replace(/\b\w/g, (c) => c.toUpperCase());
+                                    onUpdate({ status: label }, ticket.id);
+                                  }
                                 }
                               }}
                             >
@@ -257,9 +261,7 @@ export default function TicketsTable({
                       <Trash2 size={16} />
                     </button>
                   </>
-                ) : (
-                  ""
-                )}
+                ) : null}
               </TableCell>
             </TableRow>
           ))}

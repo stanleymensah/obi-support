@@ -223,9 +223,7 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
                       Create
                     </button>
                   </div>
-                ) : (
-                  ""
-                )}
+                ) : null}
               </div>
             </div>
           </div>
@@ -277,7 +275,7 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
       )}
 
       {isViewing && (
-        <Modal size="sm" title="Details" onClose={handleCloseView} noScroll>
+        <Modal size="md" title="Details" onClose={handleCloseView}>
           {(() => {
             // Only allow workflow actions if user is admin or assigned to the ticket
             const isAdmin = profile?.role === "admin";

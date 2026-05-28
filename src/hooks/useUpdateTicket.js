@@ -1,33 +1,25 @@
-import { doc, updateDoc } from "firebase/firestore";
-
-import { db } from "@/lib/firebase";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { supabase } from "@/utils/supabase";
 
 export function useUpdateTicket() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({ ticketId, updates }) => {
-      await updateDoc(doc(db, "tickets", ticketId), updates);
+      const dbUpdates = { ...updates };
+      if (Object.prototype.hasOwnProperty.call(dbUpdates, "assigneeId")) {
+        dbUpdates.assignee = dbUpdates.assigneeId || null;
+        delete dbUpdates.assigneeId;
+      }
+
+      const { error } = await supabase.from("tickets").eq("id", ticketId).update(dbUpdates);
+      if (error) throw error;
+
       return updates;
     },
     onSuccess: (updates, { ticketId }) => {
-      const ticketQueries = queryClient.getQueriesData({ queryKey: ["tickets"] });
-
-      if (ticketQueries?.length) {
-        ticketQueries.forEach(([key, value]) => {
-          if (!value) return;
-
-          queryClient.setQueryData(key, (current = []) =>
-            current.map((ticket) =>
-              ticket.id === ticketId ? { ...ticket, ...updates } : ticket
-            )
-          );
-        });
-      } else {
-        queryClient.invalidateQueries({ queryKey: ["tickets"] });
-      }
+      queryClient.invalidateQueries({ queryKey: ["tickets"] });
 
       toast.success("Ticket updated successfully.", {
         className: "bg-azure-pop text-white border-azure-pop",

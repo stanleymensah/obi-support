@@ -103,7 +103,7 @@ export default function Users() {
         </div>
 
         <div className="w-full px-4 flex flex-col flex-1 min-h-0">
-          <div className="w-full flex items-center justify-between text-gray-600 py-4 shrink-0">
+          <div className="w-full flex items-center justify-between text-gray-600 py-3 shrink-0">
             <div className="search border py-1.5 px-3 rounded-sm flex items-center gap-1 w-4/5 md:w-1/2">
               <Search size={14} />
               <input
@@ -113,7 +113,6 @@ export default function Users() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <>
               <div className="create-new">
                 <button
                   className="create text-sm bg-azure-pop text-white px-3 py-1 rounded-xs"
@@ -122,7 +121,6 @@ export default function Users() {
                   Create
                 </button>
               </div>
-            </>
           </div>
 
           <div className="flex-1 overflow-auto min-h-0">

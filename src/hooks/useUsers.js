@@ -1,40 +1,28 @@
-import { useEffect } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { db } from "@/lib/firebase";
-import { collection, query, getDocs, orderBy } from "firebase/firestore";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/utils/supabase";
 
 export function useUsers() {
-  const queryClient = useQueryClient();
-
-  useEffect(() => {
-    let mounted = true;
-
-    const cached = queryClient.getQueryData(["users"]);
-    if (cached) return;
-
-    (async () => {
-      const usersRef = collection(db, "users");
-      const q = query(usersRef, orderBy("createdAt", "asc"));
-      const snapshot = await getDocs(q);
-      if (!mounted) return;
-      const users = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      queryClient.setQueryData(["users"], users);
-    })();
-
-    return () => {
-      mounted = false;
-    };
-  }, [queryClient]);
-
   return useQuery({
     queryKey: ["users"],
-    queryFn: () => {
-      return queryClient.getQueryData(["users"]) || [];
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("users")
+        .order("created_at", { ascending: true })
+        .select("*");
+
+      if (error) throw error;
+
+      return (data || []).map((row) => ({
+        ...row,
+        firstName: row.first_name,
+        lastName: row.last_name,
+        photoURL: row.photo_url,
+        createdAt: row.created_at,
+      }));
     },
-    enabled: true,
-    staleTime: Infinity,
+    staleTime: 1000 * 60, // 1 minute
     refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
   });
 }

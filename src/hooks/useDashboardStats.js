@@ -9,7 +9,9 @@ export function useDashboardStats() {
 
     const total = allTickets.length;
     const open = allTickets.filter((t) => t.status === "Open").length;
-    const closed = allTickets.filter((t) => t.status === "Closed").length;
+    const closed = allTickets.filter((t) => t.status === "closed").length;
+    const resolved = allTickets.filter((t) => t.status === "resolved").length;
+    const reopened = allTickets.filter((t) => t.status === "reopened").length;
     const assigned = allTickets.filter((t) => {
       const assignee = String(t.assignee || "").trim();
       const status = String(t.status || "").trim().toLowerCase();
@@ -26,7 +28,9 @@ export function useDashboardStats() {
       { name: "Open", value: open, color: "#9EF56B" },
       { name: "Closed", value: closed, color: "#8E94F2" },
       { name: "In-Prog", value: inProgress, color: "#6BB7F5" },
-      {name: "Assigned", value: assigned, color: "#267352" }
+      {name: "Assigned", value: assigned, color: "#267352" },
+      {name: "Resolved", value: resolved, color: "#267352" },
+      {name: "Reopened", value: reopened, color: "#267352" },
     ];
 
     const priorityData = [
@@ -53,7 +57,9 @@ export function useDashboardStats() {
       inProgress,
       medium,
       low,
-      assigned
+      assigned,
+      resolved,
+      reopened
     };
   }, [tickets]);
 

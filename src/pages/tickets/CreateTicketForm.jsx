@@ -1,12 +1,11 @@
 import { useForm } from "react-hook-form";
-import { db } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp, getDocs, query, where, orderBy } from "firebase/firestore";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/context/AuthContext";
 import Spinner from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { useUsers } from "@/hooks/useUsers";
 import { ASSIGNEE_DISPLAY_FIELD, buildAssigneePayload, getUserDisplayLabel, findUserByAssigneeValue } from "@/lib/assignee";
+import { supabase } from "@/utils/supabase";
 
 export default function CreateTicketForm({ onClose }) {
   const { user, profile } = useAuth();
@@ -18,11 +17,6 @@ export default function CreateTicketForm({ onClose }) {
     return role === "support" || role === "admin";
   });
 
-
-  const buildTicketNumber = () => {
-    const randomDigits = Math.floor(Math.random() * 1000);
-    return String(randomDigits).padStart(3, "0");
-  };
 
   const {
     register,
@@ -39,34 +33,29 @@ export default function CreateTicketForm({ onClose }) {
     },
   });
 
-  //   Firebase Logic
   const mutation = useMutation({
     mutationFn: async (newTicket) => {
-      return await addDoc(collection(db, "tickets"), {
-        ticketNumber: buildTicketNumber(),
-        ...newTicket,
-        userId: user.uid,
-        createdBy: `${profile.firstName} ${profile.lastName}`,
+      const createdBy = user?.uid || user?.id;
+      if (!createdBy) {
+        throw new Error("Missing authenticated user id.");
+      }
+
+      const payload = {
+        title: newTicket.title,
+        email: newTicket.email,
+        priority: newTicket.priority,
+        assignee: newTicket.assigneeId || null,
+        description: newTicket.description,
+        created_by: createdBy,
         status: newTicket.assigneeId ? "Assigned" : "Open",
-        createdAt: serverTimestamp(),
-      });
+      };
+
+      const { data, error } = await supabase.from("tickets").insert(payload);
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => {
-      (async () => {
-        try {
-          const ticketsRef = collection(db, "tickets");
-          const q =
-            profile
-              ? query(ticketsRef, orderBy("createdAt", "desc"))
-              : query(ticketsRef, where("userId", "==", user.uid), orderBy("createdAt", "desc"));
-          const snapshot = await getDocs(q);
-          const tickets = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-          queryClient.setQueryData(["tickets", user?.uid], tickets);
-        // eslint-disable-next-line no-unused-vars
-        } catch (e) {
-          queryClient.invalidateQueries({ queryKey: ["tickets", user?.uid] });
-        }
-      })();
+      queryClient.invalidateQueries({ queryKey: ["tickets"] });
       toast.success("Ticket created successfully.", {
         className: "bg-azure-pop text-white border-azure-pop",
       });
@@ -83,17 +72,15 @@ export default function CreateTicketForm({ onClose }) {
 
   const onSubmit = (data) => {
     const selectedUser = findUserByAssigneeValue(users, data.assigneeId);
-    mutation.mutate({
+    const payload = {
       ...data,
       ...buildAssigneePayload(selectedUser, ASSIGNEE_DISPLAY_FIELD),
-    });
-    // keep UI behavior: pretend to submit then close
-    console.log("Create ticket:", data);
-    // if (onClose) onClose();
+    };
+
+    mutation.mutate(payload);
   };
 
   return (
-    <>
           <form
             className="flex flex-col gap-4"
             onSubmit={handleSubmit(onSubmit)}
@@ -157,10 +144,12 @@ export default function CreateTicketForm({ onClose }) {
                   <select
                     {...register("priority", { required: true })}
                     className="text-xs w-full bg-transparent outline-none"
+                    defaultValue=""
                   >
-                    <option>High</option>
-                    <option>Medium</option>
-                    <option>Low</option>
+                    <option value="" disabled>Select priority</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
                   </select>
                 </div>
               </div>
@@ -233,6 +222,5 @@ export default function CreateTicketForm({ onClose }) {
               </button>
             </div>
           </form>
-    </>
   );
 }

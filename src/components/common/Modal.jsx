@@ -1,28 +1,29 @@
 import { X } from "lucide-react";
 
-export default function Modal({ children, onClose, title, size, noScroll = false }) {
-
+export default function Modal({ children, onClose, title, size = false }) {
   const sizeClassMap = {
-    sm: "sm:max-w-120",
-    md: "sm:max-w-xl md:w-92",
+    sm: "sm:max-w-md",
+    md: "sm:max-w-2xl",
     lg: "sm:max-w-3xl",
     xl: "sm:max-w-5xl",
     full: "sm:max-w-[90vw]",
   };
 
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center">
-      <div
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6">
+      <button
+        type="button"
         className="absolute inset-0 bg-black/80"
         onClick={onClose}
+        aria-label="Close modal backdrop"
       />
 
       <div
-        className={`relative z-10 bg-white rounded-sm ${noScroll ? "max-h-none overflow-visible" : "max-h-[90vh] overflow-y-auto"} pb-4 flex flex-col gap-2 ${sizeClassMap[size] || sizeClassMap.md} `}
+        className={`relative scale-80 z-10 flex max-h-[calc(100vh-1.5rem)] w-full flex-col overflow-hidden rounded-sm bg-white shadow-2xl sm:max-h-[calc(100vh-3rem)] ${sizeClassMap[size] || sizeClassMap.md}`}
         role="dialog"
         aria-modal="true"
       >
-        <div className="header w-full flex items-center justify-between bg-azure-pop text-white  rounded-t-sm py-1 px-3">
+        <div className="header flex w-full items-center justify-between rounded-t-sm bg-azure-pop px-3 py-1 text-white">
           <h4 className="font-medium">{title}</h4>
           <button
             className="rounded-sm p-1"
@@ -33,8 +34,8 @@ export default function Modal({ children, onClose, title, size, noScroll = false
           </button>
         </div>
 
-        <div className="child flex flex-col py-1 px-3">
-            {children}
+        <div className="child flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto px-3 py-3">
+          {children}
         </div>
       </div>
     </div>

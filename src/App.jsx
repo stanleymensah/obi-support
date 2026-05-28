@@ -9,15 +9,13 @@ const queryClient = new QueryClient();
 
 export default function App() {
   return (
-    <>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <TooltipProvider>
-            <RouterProvider router={router} />
-            <Toaster position="top-center" richColors closeButton />
-          </TooltipProvider>
-        </AuthProvider>
-      </QueryClientProvider>
-    </>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider>
+          <RouterProvider router={router} />
+          <Toaster position="top-center" richColors closeButton />
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }

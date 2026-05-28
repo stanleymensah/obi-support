@@ -19,7 +19,6 @@ export default function UsersTable({
   onToggleSort,
 }) {
   return (
-    <>
       <Table>
         {users.length === 0 && (
           <TableCaption>
@@ -93,6 +92,5 @@ export default function UsersTable({
           ))}
         </TableBody>
       </Table>
-    </>
   );
 }

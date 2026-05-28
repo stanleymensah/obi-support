@@ -1,49 +1,31 @@
-import { useEffect } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { db } from "../lib/firebase";
-import { collection, query, orderBy, getDocs } from "firebase/firestore";
+import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/context/AuthContext";
 
 export function useTickets() {
   const { user, profile } = useAuth();
-  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (!user?.uid) return undefined;
-
-    let mounted = true;
-
-    const cacheKey = ["tickets", user.uid];
-    const cached = queryClient.getQueryData(cacheKey);
-    if (cached) return;
-
-    (async () => {
-      const ticketsRef = collection(db, "tickets");
-
-      // All users see all tickets
-      const q = query(ticketsRef, orderBy("createdAt", "asc"));
-      const snapshot = await getDocs(q);
-      if (!mounted) return;
-      const tickets = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      queryClient.setQueryData(cacheKey, tickets);
-    })();
-
-    return () => {
-      mounted = false;
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile?.role, queryClient, user?.uid]);
+  const userId = useMemo(() => user?.id || user?.uid || null, [user?.id, user?.uid]);
 
   return useQuery({
-    queryKey: ["tickets", user?.uid],
-    queryFn: () => {
-      return queryClient.getQueryData(["tickets", user?.uid]) || [];
+    queryKey: ["tickets", userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("tickets")
+        .order("created_at", { ascending: false })
+        .select("*");
+
+      if (error) throw error;
+
+      return (data || []).map((row) => ({
+        ...row,
+        assigneeId: row.assignee,
+        createdById: row.created_by,
+        createdAt: row.created_at,
+      }));
     },
 
-    enabled: !!user?.uid,
-    staleTime: Infinity,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
+    enabled: !!userId,
   });
 }

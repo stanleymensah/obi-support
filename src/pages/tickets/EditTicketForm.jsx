@@ -1,11 +1,10 @@
 import { useForm } from "react-hook-form";
-import { db } from "@/lib/firebase";
-import { doc, updateDoc, collection, getDocs, query, where, orderBy } from "firebase/firestore";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/context/AuthContext";
 import Spinner from "@/components/ui/spinner";
 import { useUsers } from "@/hooks/useUsers";
 import { ASSIGNEE_DISPLAY_FIELD, buildAssigneePayload, findUserByAssigneeValue, getUserDisplayLabel } from "@/lib/assignee";
+import { supabase } from "@/utils/supabase";
 
 export default function EditTicketForm({ onClose, ticket }) {
   const { user, profile } = useAuth();
@@ -33,26 +32,19 @@ export default function EditTicketForm({ onClose, ticket }) {
 
   const mutation = useMutation({
     mutationFn: async (updatedData) => {
-      // Points to the specific document using the ID
-      const ticketRef = doc(db, "tickets", ticket.id);
-      return await updateDoc(ticketRef, updatedData);
+      const payload = {
+        ...updatedData,
+        assignee: updatedData.assigneeId || null,
+      };
+      delete payload.assigneeId;
+
+      const { error } = await supabase.from("tickets").eq("id", ticket.id).update(payload);
+      if (error) throw error;
+
+      return payload;
     },
     onSuccess: () => {
-      (async () => {
-        try {
-          const ticketsRef = collection(db, "tickets");
-          const q =
-            profile
-              ? query(ticketsRef, orderBy("createdAt", "desc"))
-              : query(ticketsRef, where("userId", "==", user.uid), orderBy("createdAt", "desc"));
-          const snapshot = await getDocs(q);
-          const tickets = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-          queryClient.setQueryData(["tickets", user?.uid], tickets);
-        } catch (e) {
-          queryClient.invalidateQueries({ queryKey: ["tickets", user?.uid] });
-          console.log(e.message)
-        }
-      })();
+      queryClient.invalidateQueries({ queryKey: ["tickets"] });
       if (onClose) onClose();
     },
   });
@@ -66,7 +58,6 @@ export default function EditTicketForm({ onClose, ticket }) {
   };
 
   return (
-    <>
       <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
         <div className="title">
           <label className="label text-xs font-medium text-gray-600 ">
@@ -197,6 +188,5 @@ export default function EditTicketForm({ onClose, ticket }) {
           </button>
         </div>
       </form>
-    </>
   );
 }

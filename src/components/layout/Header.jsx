@@ -1,5 +1,12 @@
 import { useAuth } from "@/context/AuthContext";
-import { ChevronDown, Ticket, LayoutGrid, UserRoundCog, PanelBottomClose } from "lucide-react";
+import {
+  ChevronDown,
+  Ticket,
+  LayoutGrid,
+  UserRoundCog,
+  PanelBottomClose,
+  UserRound,
+} from "lucide-react";
 import { isTicketAssignedToProfile } from "@/lib/assignee";
 import { NavLink } from "react-router-dom";
 import { useMemo } from "react";
@@ -11,7 +18,6 @@ import {
 } from "@/components/ui/tooltip";
 
 export default function Header({ showDropdown }) {
-  // eslint-disable-next-line no-unused-vars
   const { profile, user } = useAuth();
   const { data: tickets = [] } = useTickets();
 
@@ -19,11 +25,12 @@ export default function Header({ showDropdown }) {
   const assignedCount = useMemo(() => {
     if (!profile) return 0;
 
-    return tickets.filter((ticket) => isTicketAssignedToProfile(ticket, profile, user?.uid)).length;
+    return tickets.filter((ticket) =>
+      isTicketAssignedToProfile(ticket, profile, user?.uid),
+    ).length;
   }, [tickets, profile, user?.uid]);
 
   return (
-    <>
       <header className="h-16 md:h-12 rounded-sm border shadow-sm px-4 flex items-center bg-white justify-between gap-2 md:gap-4">
         <div className="flex items-center gap-1 md:hidden">
           <NavLink
@@ -47,7 +54,6 @@ export default function Header({ showDropdown }) {
           </NavLink>
 
           {profile?.role === "admin" ? (
-            <>
               <NavLink
                 to="/manage-users"
                 className={({ isActive }) =>
@@ -55,12 +61,8 @@ export default function Header({ showDropdown }) {
                 }
               >
                 <UserRoundCog size={16} />
-                {/* <text className="text-xs md:text-sm">User</text> */}
               </NavLink>
-            </>
-          ) : (
-            ""
-          )}
+          ) : null}
         </div>
 
         <div className="hidden md:flex items-center gap-1">
@@ -72,36 +74,45 @@ export default function Header({ showDropdown }) {
           </p> */}
           <img src="/images/help.png" alt="" className="w-6" />
           <h4 className="text-lg text-azure-dark">Obi Support</h4>
-     
         </div>
 
         <div className="hidden md:flex md:flex-1 " />
-        <Tooltip>
-          <TooltipTrigger>
-            <NavLink to="/tickets/assigned" className="hidden md:flex items-center cursor-pointer relative border p-1.5 rounded-full">
-              <PanelBottomClose  size={18} className="text-gray-500" />
-              {assignedCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full border-white">
-                  {assignedCount > 99 ? "99+" : assignedCount}
-                </span>
-              )}
-            </NavLink>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p className="text-[10px]">Assigned Tickets</p>
-          </TooltipContent>
-        </Tooltip>
+        {(profile?.role === "admin" ||
+          profile?.role === "support") && (
+          <Tooltip>
+            <TooltipTrigger>
+              <NavLink
+                to="/tickets/assigned"
+                className="hidden md:flex items-center cursor-pointer relative border p-1.5 rounded-full"
+              >
+                <PanelBottomClose size={18} className="text-gray-500" />
+                {assignedCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full border-white">
+                    {assignedCount > 99 ? "99+" : assignedCount}
+                  </span>
+                )}
+              </NavLink>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="text-[10px]">Assigned Tickets</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
 
         <div
           className="user flex items-center gap-2 cursor-pointer"
           onClick={showDropdown}
         >
-          <div className="img w-8">
-            <img
-              src="/images/pfp.jpg"
-              alt=""
-              className="object-cover rounded-full"
-            />
+          <div className="img w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 overflow-hidden">
+            {profile?.photoURL ? (
+              <img
+                src={profile.photoURL}
+                alt={`${profile?.firstName} ${profile?.lastName}`}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <UserRound size={18} className="text-gray-600" />
+            )}
           </div>
           <div className="name flex flex-col justify-center">
             <p className="font-medium text-xs">
@@ -113,6 +124,5 @@ export default function Header({ showDropdown }) {
           </div>
         </div>
       </header>
-    </>
   );
 }

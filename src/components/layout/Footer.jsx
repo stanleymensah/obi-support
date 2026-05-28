@@ -9,7 +9,7 @@ export default function Footer() {
         <Link to="/dashboard" >Obi Support</Link><span className="text-xs">&copy; {currentYear} </span>
       </div>
       <div>
-        <span className="text-xs">Powered by Firebase</span>
+        <span className="text-xs">Powered by Supabase</span>
       </div>
     </footer>
   );

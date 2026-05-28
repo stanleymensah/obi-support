@@ -6,8 +6,16 @@ export default function UserDetails({ user }) {
     <div className="flex flex-col gap-6 p-1">
       {/* Header Info */}
       <div className="flex items-center gap-4">
-        <div className="w-16 h-16 bg-azure-pop/10 rounded-full flex items-center justify-center text-azure-pop border border-azure-pop/20">
-          <User size={32} />
+        <div className="w-16 h-16 bg-azure-pop/10 rounded-full flex items-center justify-center text-azure-pop border border-azure-pop/20 overflow-hidden">
+          {user.photoURL ? (
+            <img
+              src={user.photoURL}
+              alt={`${user.firstName} ${user.lastName}`}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <User size={32} />
+          )}
         </div>
         <div className="flex flex-col">
           <h3 className="text-lg font-bold text-gray-800">

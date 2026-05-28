@@ -1,8 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { auth, db } from "@/lib/firebase";
-import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
 import { useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/utils/supabase";
 
 const AuthContext = createContext();
 
@@ -12,26 +10,68 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const queryClient = useQueryClient();
 
-  useEffect(() => {
-    return onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
-        setUser(firebaseUser);
-        setProfile(userDoc.exists() ? userDoc.data() : null);
-      } else {
+  const restoreSession = async () => {
+    setLoading(true);
+
+    try {
+      const savedUser = localStorage.getItem("supabase_user");
+      if (!savedUser) {
         setUser(null);
         setProfile(null);
-        // Clear cached users and tickets when signing out
-        try {
-          queryClient.removeQueries({ queryKey: ["users"] });
-          queryClient.removeQueries({ queryKey: ["tickets"] });
-        } catch (e) {
-          // ignore if queryClient not ready
-          console.log(e.message)
-        }
+        return;
       }
+
+      const parsedUser = JSON.parse(savedUser);
+      setUser(parsedUser);
+
+      const { data, error } = await supabase
+        .from("users")
+        .eq("id", parsedUser.id)
+        .select("*");
+
+      if (error) {
+        setProfile(null);
+      } else {
+        const row = data?.[0] || null;
+        setProfile(
+          row
+            ? {
+                ...row,
+                uid: row.id,
+                firstName: row.first_name,
+                lastName: row.last_name,
+                photoURL: row.photo_url,
+                createdAt: row.created_at,
+              }
+            : null,
+        );
+      }
+    } catch {
+      setUser(null);
+      setProfile(null);
+    } finally {
       setLoading(false);
-    });
+    }
+  };
+
+  useEffect(() => {
+    restoreSession();
+
+    const handleAuthChange = () => {
+      restoreSession();
+    };
+
+    window.addEventListener("auth-changed", handleAuthChange);
+
+    return () => {
+      window.removeEventListener("auth-changed", handleAuthChange);
+      try {
+        queryClient.removeQueries({ queryKey: ["users"] });
+        queryClient.removeQueries({ queryKey: ["tickets"] });
+      } catch {
+        // noop
+      }
+    };
   }, [queryClient]);
 
   return (

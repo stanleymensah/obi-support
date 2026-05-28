@@ -12,6 +12,8 @@ dist
 dist-ssr
 todo.md
 *.local
+supabase-cli/
+supabase-cli.zip
 
 # Editor directories and files
 .vscode/*
