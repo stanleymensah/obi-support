@@ -1,29 +1,23 @@
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  ArrowDown,
-  ArrowUp,
-  SquarePen,
-  Trash2,
-} from "lucide-react";
+import { ArrowDown, ArrowUp, SquarePen, Trash2 } from "lucide-react";
 import { formatRelativeTime } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { NoTickets } from "@/components/common/NoTickets";
+import { useEffect, useRef, useState } from "react";
+import Modal from "@/components/common/Modal";
 
 const priorityVariants = {
   low: "outline",
-  medium: "default", 
-  high: "destructive", 
+  medium: "default",
+  high: "destructive",
 };
-
-import { useEffect, useRef, useState } from "react";
-import Modal from "@/components/common/Modal";
 
 export default function TicketsTable({
   tickets,
@@ -31,21 +25,26 @@ export default function TicketsTable({
   onEdit,
   onView,
   onUpdate,
-  profile,
   sortOrder,
   onToggleSort,
   users = [],
 }) {
   const [openMenuFor, setOpenMenuFor] = useState(null);
   const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
-  const [assignmentModal, setAssignmentModal] = useState({ open: false, ticketId: null });
+  const [assignmentModal, setAssignmentModal] = useState({
+    open: false,
+    ticketId: null,
+  });
   const actionMenuRef = useRef(null);
 
   useEffect(() => {
     if (!openMenuFor) return;
 
     const handlePointerDown = (event) => {
-      if (actionMenuRef.current && !actionMenuRef.current.contains(event.target)) {
+      if (
+        actionMenuRef.current &&
+        !actionMenuRef.current.contains(event.target)
+      ) {
         setOpenMenuFor(null);
       }
     };
@@ -56,7 +55,6 @@ export default function TicketsTable({
       document.removeEventListener("pointerdown", handlePointerDown);
     };
   }, [openMenuFor]);
-  
 
   const getValidTransitions = (currentStatus) => {
     const normalized = String(currentStatus || "closed")
@@ -70,7 +68,7 @@ export default function TicketsTable({
       "in-progress": ["resolved"],
       resolved: ["closed", "reopened"],
       reopened: ["in-progress"],
-      closed: [], // Terminal state — no transitions allowed
+      closed: [],
     };
 
     return transitions[normalized] || [];
@@ -93,11 +91,17 @@ export default function TicketsTable({
 
   const handleAssignUser = (userId) => {
     if (onUpdate) {
-      // Store status in Title Case (consistent with other flows)
-      onUpdate({ status: "Assigned", assigneeId: userId }, assignmentModal.ticketId);
+      onUpdate(
+        { status: "Assigned", assigneeId: userId },
+        assignmentModal.ticketId,
+      );
     }
     setAssignmentModal({ open: false, ticketId: null });
   };
+
+  if (!tickets || tickets.length === 0) {
+    return <NoTickets />;
+  }
 
   return (
     <>
@@ -109,7 +113,9 @@ export default function TicketsTable({
         >
           <div className="space-y-2">
             {users.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No users available</p>
+              <p className="text-sm text-muted-foreground">
+                No users available
+              </p>
             ) : (
               users.map((user) => (
                 <button
@@ -125,7 +131,6 @@ export default function TicketsTable({
         </Modal>
       )}
       <Table>
-        {tickets.length === 0 && <TableCaption>No tickets found!</TableCaption>}
         <TableHeader>
           <TableRow>
             <TableHead className="w-20 hidden md:table-cell">ID</TableHead>
@@ -145,7 +150,9 @@ export default function TicketsTable({
               </button>
             </TableHead>
             <TableHead className="w-30 text-center">Priority</TableHead>
-            <TableHead className="w-25 text-center hidden md:table-cell">Status</TableHead>
+            <TableHead className="w-25 text-center hidden md:table-cell">
+              Status
+            </TableHead>
             <TableHead className="w-30 text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -182,8 +189,13 @@ export default function TicketsTable({
                       e.stopPropagation();
                       if (getValidTransitions(ticket.status).length > 0) {
                         const rect = e.currentTarget.getBoundingClientRect();
-                        setMenuPos({ top: rect.bottom + window.scrollY, left: rect.left + window.scrollX });
-                        setOpenMenuFor(openMenuFor === ticket.id ? null : ticket.id);
+                        setMenuPos({
+                          top: rect.bottom + window.scrollY,
+                          left: rect.left + window.scrollX,
+                        });
+                        setOpenMenuFor(
+                          openMenuFor === ticket.id ? null : ticket.id,
+                        );
                       }
                     }}
                     disabled={getValidTransitions(ticket.status).length === 0}
@@ -202,66 +214,69 @@ export default function TicketsTable({
                   {openMenuFor === ticket.id && (
                     <div
                       onClick={(e) => e.stopPropagation()}
-                      style={{ position: "fixed", top: `${menuPos.top}px`, left: `${menuPos.left}px`, minWidth: 128 }}
+                      style={{
+                        position: "fixed",
+                        top: `${menuPos.top}px`,
+                        left: `${menuPos.left}px`,
+                        minWidth: 128,
+                      }}
                       className="rounded-sm bg-card border border-border shadow-sm z-50"
                     >
                       <ul className="py-0.5">
                         {getValidTransitions(ticket.status).map((opt) => (
                           <li key={opt}>
                             <button
-                              className="w-full text-left px-2 py-1 text-xs hover:bg-muted"
+                              className="w-full text-left px-2 py-1 text-xs hover:bg-muted capitalize"
                               onClick={() => {
                                 if (opt === "assigned") {
                                   setOpenMenuFor(null);
-                                  setAssignmentModal({ open: true, ticketId: ticket.id });
-                                  } else {
+                                  setAssignmentModal({
+                                    open: true,
+                                    ticketId: ticket.id,
+                                  });
+                                } else {
                                   setOpenMenuFor(null);
                                   if (onUpdate) {
-                                    const label = opt
+                                    const formattedLabel = opt
                                       .replace(/-/g, " ")
                                       .replace(/\b\w/g, (c) => c.toUpperCase());
-                                    onUpdate({ status: label }, ticket.id);
+                                    onUpdate({ status: formattedLabel }, ticket.id);
                                   }
                                 }
                               }}
                             >
-                              {opt.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase())}
+                              {opt.replace(/-/g, " ")}
                             </button>
                           </li>
                         ))}
-                        {getValidTransitions(ticket.status).length === 0 && (
-                          <li className="px-2 py-1 text-xs text-muted-foreground">
-                            No actions available
-                          </li>
-                        )}
                       </ul>
                     </div>
                   )}
                 </div>
               </TableCell>
-              <TableCell className="text-right py-6 md:py-2 flex items-center justify-end gap-1 space-x-1">
-                {profile?.role === "admin" ? (
-                  <>
-                    <button
-                      className="text-blue-500"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEdit(ticket);
-                      }}
-                    >
-                      <SquarePen size={16} />
-                    </button>
-                    <button
-                      className="text-red-500"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDelete(ticket.id);
-                      }}
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </>
-                ) : null}
+              <TableCell className="py-2 text-right">
+                <div className="flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit(ticket);
+                    }}
+                    className="p-1 rounded-sm hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                  >
+                    <SquarePen size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(ticket.id);
+                    }}
+                    className="p-1 rounded-sm hover:bg-muted transition-colors text-muted-foreground hover:text-destructive"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               </TableCell>
             </TableRow>
           ))}

@@ -1,4 +1,4 @@
-import { formatDate, formatRelativeTime } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import {
   ASSIGNEE_DISPLAY_FIELD,
   getTicketAssigneeLabel,
@@ -114,7 +114,7 @@ export default function TicketDetails({ ticket, users, profile }) {
           {dueDate ? formatDate(dueDate) : "Pending..."}
         </div>
 
-        <div className=" text-gray-500">Labels</div>
+        <div className=" text-gray-500">Priority</div>
         <div>
           <span className="inline-flex w-fit items-center rounded-full bg-violet-100 px-2.5 py-0.5 text-[12px] font-semibold text-violet-700">
             {labelValue || "Discover"}

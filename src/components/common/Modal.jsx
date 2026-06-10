@@ -1,6 +1,6 @@
 import { X } from "lucide-react";
 
-export default function Modal({ children, onClose, title, size = false }) {
+export default function Modal({ children, onClose, title, size = false, scaler = false }) {
   const sizeClassMap = {
     sm: "sm:max-w-md",
     md: "sm:max-w-2xl",
@@ -8,6 +8,13 @@ export default function Modal({ children, onClose, title, size = false }) {
     xl: "sm:max-w-5xl",
     full: "sm:max-w-[90vw]",
   };
+  const scale = {
+    sm: "scale-10",
+    md: "scale-30",
+    lg: "scale-50",
+    xl: "scale-80",
+    full: "scale-100",
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6">
@@ -19,7 +26,7 @@ export default function Modal({ children, onClose, title, size = false }) {
       />
 
       <div
-        className={`relative scale-80 z-10 flex max-h-[calc(100vh-1.5rem)] w-full flex-col overflow-hidden rounded-sm bg-white shadow-2xl sm:max-h-[calc(100vh-3rem)] ${sizeClassMap[size] || sizeClassMap.md}`}
+        className={`relative z-10 flex max-h-[calc(100vh-1.5rem)] w-full flex-col overflow-hidden rounded-sm bg-white shadow-2xl sm:max-h-[calc(100vh-3rem)] ${sizeClassMap[size] || sizeClassMap.md} ${scale[scaler]}`}
         role="dialog"
         aria-modal="true"
       >

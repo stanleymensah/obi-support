@@ -15,6 +15,7 @@ import usePagination from "@/hooks/usePagination";
 import Pagination from "@/components/common/Pagination";
 import { sortByCreatedAt } from "@/lib/utils";
 import Spinner from "@/components/ui/spinner";
+import { NoUsers } from "@/components/common/NoUsers";
 
 export default function Users() {
   const { data: users, isLoading, error } = useUsers();
@@ -95,9 +96,13 @@ export default function Users() {
     return <Navigate to="/" replace />;
   }
 
+  if (!users || users.length === 0) {
+      return <NoUsers />;
+    }
+
   return (
     <>
-      <div className="users border h-full rounded-md bg-white flex flex-col overflow-hidden">
+      <div className="users border h-full bg-white flex flex-col overflow-hidden">
         <div className="top flex items-center justify-between py-2 px-4 text-white bg-azure-pop shrink-0">
           <h4>Users</h4>
         </div>

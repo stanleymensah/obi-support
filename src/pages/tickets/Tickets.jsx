@@ -173,7 +173,7 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
 
   return (
     <>
-      <div className="tickets border h-full rounded-md bg-white flex flex-col overflow-hidden">
+      <div className="tickets border h-full bg-white flex flex-col overflow-hidden">
         <div className="top flex items-center justify-between py-2 px-4 text-white bg-azure-pop shrink-0">
           <h4>Support</h4>
         </div>
@@ -275,7 +275,7 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
       )}
 
       {isViewing && (
-        <Modal size="md" title="Details" onClose={handleCloseView}>
+        <Modal size="md" title="Details" onClose={handleCloseView} scaler="xl">
           {(() => {
             // Only allow workflow actions if user is admin or assigned to the ticket
             const isAdmin = profile?.role === "admin";

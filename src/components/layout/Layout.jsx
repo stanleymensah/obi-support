@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import Sidebar from "./Sidebar";
+import AppSidebar from "./Sidebar";
 import { Link, useNavigate, Outlet, Navigate } from "react-router-dom";
 import Header from "./Header";
 import { useState } from "react";
@@ -7,6 +7,7 @@ import { LogOut, UserRound } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import Spinner from "../ui/spinner";
 import Footer from "./Footer";
+import { SidebarProvider } from "../ui/sidebar";
 
 export default function Layout() {
   const [dropdown, setDropdown] = useState(false);
@@ -38,21 +39,18 @@ export default function Layout() {
 
   return (
     <>
-      <main className="relative w-full flex flex-col md:grid md:grid-cols-12 gap-0.5 p-1 h-screen overflow-hidden bg-linear-to-b from-azure-surface via-azure-pop/10 to-azure-pop/20">
-        <div className="hidden md:flex md:col-span-2 md:h-full md:min-h-0">
-          <Sidebar />
-        </div>
+      <SidebarProvider>
+        <AppSidebar />
+        <main className="relative w-full flex flex-col h-screen overflow-hidden bg-linear-to-b from-azure-surface via-azure-pop/10 to-azure-pop/20">
+            <Header showDropdown={() => setDropdown(!dropdown)} />
 
-        <div className="w-full md:col-span-10 h-full min-h-0 overflow-y-auto flex flex-col gap-0.5">
-          <Header showDropdown={() => setDropdown(!dropdown)} />
+            <div className="flex-1 overflow-auto">
+              <Outlet />
+            </div>
 
-          <div className="flex-1 overflow-auto">
-            <Outlet />
-          </div>
-
-          <Footer />
-        </div>
-      </main>
+            <Footer />
+        </main>
+      </SidebarProvider>
 
       {dropdown && (
         <>
