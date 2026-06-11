@@ -1,14 +1,5 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 
-// const data = [
-//   { name: "Scarlett Evans", value: 1, color: "#9EF56B" },
-//   { name: "Daniel Baker", value: 1, color: "#8E94F2" },
-//   { name: "Chloe Foster", value: 1, color: "#C86DF1" },
-//   { name: "Avery Nelson", value: 1, color: "#F7A431" },
-//   { name: "Oliver Roberts", value: 1, color: "#6BB7F5" },
-//   { name: "Christian Brooks", value: 1, color: "#F5E942" },
-// ];
-
 export default function Status({data}) {
   return (
     <div className="w-full h-58">

@@ -170,21 +170,27 @@ export default function TicketsTable({
           title="Assign Ticket"
         >
           <div className="space-y-2">
-            {users.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No users available
-              </p>
-            ) : (
-              users.map((user) => (
-                <button
-                  key={user.id}
-                  onClick={() => handleAssignUser(user.id)}
-                  className="w-full text-left px-4 py-2 rounded-sm hover:bg-muted transition-colors text-sm"
-                >
-                  {user.displayName || user.email}
-                </button>
-              ))
-            )}
+            {(() => {
+              const assignableUsers = users.filter((u) => {
+                const role = String(u?.role || "").toLowerCase();
+                return role === "admin" || role === "support";
+              });
+              return assignableUsers.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  No admins or support users available
+                </p>
+              ) : (
+                assignableUsers.map((user) => (
+                  <button
+                    key={user.id}
+                    onClick={() => handleAssignUser(user.id)}
+                    className="w-full text-left px-4 py-2 rounded-sm hover:bg-muted transition-colors text-sm"
+                  >
+                    {user.displayName || user.email}
+                  </button>
+                ))
+              );
+            })()}
           </div>
         </Modal>
       )}

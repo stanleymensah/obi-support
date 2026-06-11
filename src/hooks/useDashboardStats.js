@@ -9,16 +9,16 @@ export function useDashboardStats() {
 
     const total = allTickets.length;
     const open = allTickets.filter((t) => t.status === "Open").length;
-    const closed = allTickets.filter((t) => t.status === "closed").length;
-    const resolved = allTickets.filter((t) => t.status === "resolved").length;
-    const reopened = allTickets.filter((t) => t.status === "reopened").length;
+    const closed = allTickets.filter((t) => t.status === "Closed").length;
+    const resolved = allTickets.filter((t) => t.status === "Resolved").length;
+    const reopened = allTickets.filter((t) => t.status === "Reopened").length;
     const assigned = allTickets.filter((t) => {
       const assignee = String(t.assignee || "").trim();
       const status = String(t.status || "").trim().toLowerCase();
       return assignee !== "" && status === "assigned";
     }).length;
     const inProgress = allTickets.filter(
-      (t) => t.status === "in-progress",
+      (t) => t.status === "In Progress",
     ).length;
     const high = allTickets.filter((t) => t.priority === "High").length;
     const medium = allTickets.filter((t) => t.priority === "Medium").length;
