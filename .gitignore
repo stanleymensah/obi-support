@@ -25,3 +25,5 @@ supabase-cli.zip
 *.njsproj
 *.sln
 *.sw?
+
+.env

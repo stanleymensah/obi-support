@@ -102,7 +102,7 @@ export default function Users() {
 
   return (
     <>
-      <div className="users border h-full bg-white flex flex-col overflow-hidden">
+      <div className="users h-full bg-white flex flex-col overflow-hidden">
         <div className="top flex items-center justify-between py-2 px-4 text-white bg-azure-pop shrink-0">
           <h4>Users</h4>
         </div>

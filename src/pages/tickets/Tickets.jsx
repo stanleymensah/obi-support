@@ -173,7 +173,7 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
 
   return (
     <>
-      <div className="tickets border h-full bg-white flex flex-col overflow-hidden">
+      <div className="tickets h-full bg-white flex flex-col overflow-hidden">
         <div className="top flex items-center justify-between py-2 px-4 text-white bg-azure-pop shrink-0">
           <h4>Support</h4>
         </div>

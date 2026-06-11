@@ -116,7 +116,14 @@ export default function EditTicketForm({ onClose, ticket }) {
                 className="text-xs w-full bg-transparent outline-none"
               >
                 <option value="Open">Open</option>
-                <option value="In Progress">In Progress</option>
+                <option
+                  value="In Progress"
+                  disabled={
+                    !ticket.assignee && !ticket.assigneeId
+                  }
+                >
+                  In Progress
+                </option>
                 <option value="Closed">Closed</option>
               </select>
             </div>
