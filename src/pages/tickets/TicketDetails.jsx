@@ -96,7 +96,7 @@ export default function TicketDetails({ ticket, users, profile }) {
         </div>
 
         <div className=" text-gray-500">Assigned to</div>
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 items-center gap-2">
           <div className="h-6 w-6 overflow-hidden rounded-full bg-gray-200">
             {assigneePhoto ? (
               <img
@@ -106,11 +106,11 @@ export default function TicketDetails({ ticket, users, profile }) {
               />
             ) : null}
           </div>
-          <span className=" text-gray-700">{assigneeName}</span>
+          <span className="min-w-0 break-words text-gray-700">{assigneeName}</span>
         </div>
 
         <div className=" text-gray-500">Created</div>
-        <div className=" text-gray-700">
+        <div className="min-w-0 break-words text-gray-700">
           {dueDate ? formatDate(dueDate) : "Pending..."}
         </div>
 

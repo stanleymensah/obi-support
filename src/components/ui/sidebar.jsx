@@ -45,6 +45,8 @@ function SidebarProvider({
   defaultOpen = true,
   open: openProp,
   onOpenChange: setOpenProp,
+  mobileOpen: mobileOpenProp,
+  onMobileOpenChange: setMobileOpenProp,
   className,
   style,
   children,
@@ -52,6 +54,18 @@ function SidebarProvider({
 }) {
   const isMobile = useIsMobile()
   const [openMobile, setOpenMobile] = React.useState(false)
+  const resolvedOpenMobile = mobileOpenProp ?? openMobile
+  const handleMobileOpenChange = React.useCallback((value) => {
+    const nextOpen = typeof value === "function"
+      ? value(resolvedOpenMobile)
+      : value
+
+    if (setMobileOpenProp) {
+      setMobileOpenProp(nextOpen)
+    } else {
+      setOpenMobile(nextOpen)
+    }
+  }, [resolvedOpenMobile, setMobileOpenProp])
 
   // This is the internal state of the sidebar.
   // We use openProp and setOpenProp for control from outside the component.
@@ -71,8 +85,10 @@ function SidebarProvider({
 
   // Helper to toggle the sidebar.
   const toggleSidebar = React.useCallback(() => {
-    return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open);
-  }, [isMobile, setOpen, setOpenMobile])
+    return isMobile
+      ? handleMobileOpenChange((currentOpen) => !currentOpen)
+      : setOpen((currentOpen) => !currentOpen);
+  }, [handleMobileOpenChange, isMobile, setOpen])
 
   // Adds a keyboard shortcut to toggle the sidebar.
   React.useEffect(() => {
@@ -99,10 +115,10 @@ function SidebarProvider({
     open,
     setOpen,
     isMobile,
-    openMobile,
-    setOpenMobile,
+    openMobile: resolvedOpenMobile,
+    setOpenMobile: handleMobileOpenChange,
     toggleSidebar,
-  }), [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar])
+  }), [state, open, setOpen, isMobile, resolvedOpenMobile, handleMobileOpenChange, toggleSidebar])
 
   return (
     <SidebarContext.Provider value={contextValue}>
@@ -130,6 +146,7 @@ function Sidebar({
   side = "left",
   variant = "sidebar",
   collapsible = "offcanvas",
+  mobileWidth = SIDEBAR_WIDTH_MOBILE,
   className,
   children,
   dir,
@@ -162,7 +179,7 @@ function Sidebar({
           className="w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
           style={
             {
-              "--sidebar-width": SIDEBAR_WIDTH_MOBILE
+              "--sidebar-width": mobileWidth
             }
           }
           side={side}>

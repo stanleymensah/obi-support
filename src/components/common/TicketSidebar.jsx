@@ -20,6 +20,10 @@ export default function TicketSidebar({
       onOpenChange={(nextOpen) => {
         if (!nextOpen) onClose();
       }}
+      mobileOpen={open}
+      onMobileOpenChange={(nextOpen) => {
+        if (!nextOpen) onClose();
+      }}
       className="contents"
       style={{ "--sidebar-width": width }}
     >
@@ -39,6 +43,7 @@ export default function TicketSidebar({
         side="right"
         collapsible="offcanvas"
         variant="sidebar"
+        mobileWidth="100vw"
         className="z-30"
       >
         <SidebarHeader className="flex-row items-center justify-between bg-azure-pop text-white">

@@ -92,7 +92,7 @@ export default function TicketComments({ ticketId, profile, users: usersProp }) 
           return (
             <div key={comment.id} className="border-b border-gray-100 pb-4 last:border-b-0">
               <div className="flex items-start gap-3">
-                <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-gray-100">
+                <div className="h-10 w-10 shrink-0 overflow-hidden flex items-center justify-center rounded-full bg-gray-100">
                   {author.photoURL ? (
                     <img src={author.photoURL} alt={author.name} className="h-full w-full object-cover" />
                   ) : (
@@ -102,14 +102,14 @@ export default function TicketComments({ ticketId, profile, users: usersProp }) 
                   )}
                 </div>
 
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 text-sm">
+                <div className="flex flex-1 flex-col gap-0">
+                  <div className="flex items-center gap-2 text-sm leading-tight">
                     <span className="font-semibold text-gray-800">{author.name}</span>
                     <span className="text-gray-400">•</span>
                     <span className="text-gray-500">{formatRelativeTime(comment.createdAt)}</span>
                   </div>
 
-                  <div className="mt-2 text-sm leading-relaxed text-gray-600">
+                  <div className="mt-0.5 text-sm leading-tight text-gray-600">
                     {comment.text}
                   </div>
 
