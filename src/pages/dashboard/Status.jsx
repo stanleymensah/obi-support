@@ -2,7 +2,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 
 export default function Status({data}) {
   return (
-    <div className="w-full h-58">
+    <div className="w-full h-[calc(100%_-_2rem)]">
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie

@@ -1,5 +1,5 @@
 import { LayoutGrid, Ticket, UserRoundCog } from "lucide-react";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, NavLink } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -61,15 +61,22 @@ export default function AppSidebar() {
             <SidebarMenu>
               {navItems.map((nav, index) => (
                 <SidebarMenuItem key={index}>
-                  <SidebarMenuButton asChild isActive={pathname === nav.url}>
-                    <Link
-                      to={nav.url}
-                      className="flex items-center gap-2 w-full"
+                  <NavLink
+                    to={nav.url}
+                    className="flex items-center gap-4 w-full"
+                  >
+                    <SidebarMenuButton
+                      isActive={pathname === nav.url}
+                      className={`mb-2 px-4 py-6 ${
+                        pathname === nav.url
+                          ? "bg-azure-pop text-white hover:bg-azure-pop/90 hover:text-white data-active:bg-azure-pop data-active:text-white"
+                          : ""
+                      }`}
                     >
                       {nav.icon}
                       {nav.name}
-                    </Link>
-                  </SidebarMenuButton>
+                    </SidebarMenuButton>
+                  </NavLink>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>

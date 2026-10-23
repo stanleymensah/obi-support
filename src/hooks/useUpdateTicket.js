@@ -13,7 +13,10 @@ export function useUpdateTicket() {
         delete dbUpdates.assigneeId;
       }
 
-      const { error } = await supabase.from("tickets").eq("id", ticketId).update(dbUpdates);
+      const { error } = await supabase
+        .from("tickets")
+        .eq("id", ticketId)
+        .update(dbUpdates);
       if (error) throw error;
 
       return updates;

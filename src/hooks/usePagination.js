@@ -2,20 +2,25 @@ import { useState, useMemo, useEffect } from "react";
 
 export default function usePagination(items, itemsPerPage = 10) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(itemsPerPage);
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentPage(1);
   }, [items.length]);
 
-  const totalPages = Math.ceil(items.length / itemsPerPage) || 1;
+  const totalPages = Math.ceil(items.length / pageSize) || 1;
   const goToFirstPage = () => setCurrentPage(1);
   const goToLastPage = () => setCurrentPage(totalPages);
+  const changePageSize = (size) => {
+    setPageSize(size);
+    setCurrentPage(1);
+  };
 
   const currentItems = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
     return items.slice(startIndex, endIndex);
-  }, [items, currentPage, itemsPerPage]);
+  }, [items, currentPage, pageSize]);
 
   const goToPage = (page) => {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
@@ -31,6 +36,8 @@ export default function usePagination(items, itemsPerPage = 10) {
 
   return {
     currentPage,
+    pageSize,
+    changePageSize,
     totalPages,
     currentItems,
     nextPage,

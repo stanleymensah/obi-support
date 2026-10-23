@@ -54,7 +54,7 @@ const formatStatusLabel = (status) => {
 
 export default function TicketDetails({ ticket, users, profile }) {
   const status = normalizeStatus(ticket?.status);
-  const [activeTab, setActiveTab] = useState("comments");
+  const [activeTab, setActiveTab] = useState("description");
   const { data: comments = [] } = useTicketComments(ticket?.id);
   const assigneeUser = getTicketAssigneeUser(ticket, users);
   const assigneeName = assigneeUser
@@ -82,12 +82,12 @@ export default function TicketDetails({ ticket, users, profile }) {
   const commentsCount = comments.length;
 
   return (
-    <div className="flex flex-col gap-5 px-1 py-1">
-      <h3 className="max-w-xl text-2xl font-semibold leading-tight text-gray-900">
+    <div className="flex h-full w-full min-h-0 flex-col gap-5 overflow-x-hidden px-1 py-1">
+      <h4 className="max-w-xl text-2xl font-semibold leading-tight text-gray-900 flex-wrap">
         {ticket?.title || "No title provided."}
-      </h3>
+      </h4>
 
-      <div className="grid grid-cols-[92px_minmax(0,1fr)] min-w-120 gap-y-4 gap-x-4">
+      <div className="grid w-full min-w-0 grid-cols-[92px_minmax(0,1fr)] gap-x-4 gap-y-4">
         <div className="text-gray-500">Status</div>
         <div
           className={`font-medium ${status === "completed" ? "text-emerald-600" : "text-gray-700"}`}
@@ -126,6 +126,16 @@ export default function TicketDetails({ ticket, users, profile }) {
         <div className="flex items-center gap-6">
           <button
             type="button"
+            onClick={() => setActiveTab("description")}
+            className={`relative pb-3  font-medium ${activeTab === "description" ? "text-gray-900" : "text-gray-500"}`}
+          >
+            Description
+            {activeTab === "description" && (
+              <span className="absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-gray-900" />
+            )}
+          </button>
+          <button
+            type="button"
             onClick={() => setActiveTab("comments")}
             className={`relative pb-3  font-medium ${activeTab === "comments" ? "text-gray-900" : "text-gray-500"}`}
           >
@@ -139,33 +149,22 @@ export default function TicketDetails({ ticket, users, profile }) {
               <span className="absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-gray-900" />
             )}
           </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("description")}
-            className={`relative pb-3  font-medium ${activeTab === "description" ? "text-gray-900" : "text-gray-500"}`}
-          >
-            Description
-            {activeTab === "description" && (
-              <span className="absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-gray-900" />
-            )}
-          </button>
         </div>
       </div>
 
-      <div className="pt-1">
-        {activeTab === "comments" ? (
-          <div className="">
+      <div className="flex min-h-0 flex-1 flex-col pt-1">
+        {activeTab === "description" ? (
+          <div className="rounded-sm bg-gray-50 px-4 py-4  leading-relaxed text-gray-800">
+            {ticket?.description || "No description provided."}
+          </div>
+        ) : (
+          <div className="min-h-0 flex-1 overflow-y-auto">
             <TicketComments
               ticketId={ticket?.id}
               profile={profile}
               ticket={ticket}
               users={users}
             />
-          </div>
-        ) : (
-          <div className="rounded-sm bg-gray-50 px-4 py-4  leading-relaxed text-gray-800">
-            {ticket?.description || "No description provided."}
           </div>
         )}
       </div>

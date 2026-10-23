@@ -1,13 +1,27 @@
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 import Spinner from "@/components/ui/spinner";
+import { requireSupabaseKey, supabaseUrl } from "@/config/supabase";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+async function readResponse(response) {
+  const text = await response.text();
+
+  if (!text) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(`Supabase returned an invalid response (${response.status}).`);
+  }
+}
 
 export default function Login() {
   const [loginError, setLoginError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const {
     register,
@@ -18,6 +32,7 @@ export default function Login() {
   const onSubmit = async (data) => {
     setLoginError("");
     try {
+      const supabaseKey = requireSupabaseKey();
       const response = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=password`, {
         method: "POST",
         headers: {
@@ -31,9 +46,13 @@ export default function Login() {
         }),
       });
 
-      const authData = await response.json();
+      const authData = await readResponse(response);
       if (!response.ok || !authData?.user) {
-        throw new Error(authData?.error_description || "Invalid email or password.");
+        throw new Error(
+          authData?.error_description ||
+          authData?.msg ||
+          `Login failed (${response.status}).`,
+        );
       }
 
       localStorage.setItem("supabase_access_token", authData.access_token || "");
@@ -76,12 +95,22 @@ export default function Login() {
 
         <div className="flex flex-col gap-2">
           <label className=" font-semibold">Password</label>
-          <input
-            {...register("logPassword", { required: "Password is required!" })}
-            type="password"
-            placeholder="Enter your password"
-            className={`p-3 border rounded-lg focus:outline-none focus:border-primary ${errors.logPassword ? "border-red-500" : "border-primary/50"}`}
-          />
+          <div className="relative">
+            <input
+              {...register("logPassword", { required: "Password is required!" })}
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter your password"
+              className={`p-3 pr-10 w-full border rounded-lg focus:outline-none focus:border-primary ${errors.logPassword ? "border-red-500" : "border-primary/50"}`}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((visible) => !visible)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+            >
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
         </div>
         {errors.logPassword && (
           <span className="font-medium text-red-400">

@@ -1,5 +1,4 @@
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+import { requireSupabaseKey, supabaseUrl } from "@/config/supabase";
 
 function buildUrl(table, { columns = "*", filters = [], order = null } = {}) {
   const url = new URL(`${supabaseUrl}/rest/v1/${table}`);
@@ -30,6 +29,7 @@ async function request({
   order = null,
   returnRepresentation = false,
 }) {
+  const supabaseKey = requireSupabaseKey();
   const response = await fetch(buildUrl(table, { columns, filters, order }), {
     method,
     headers: {
@@ -42,7 +42,18 @@ async function request({
   });
 
   const text = await response.text();
-  const data = text ? JSON.parse(text) : null;
+  let data = null;
+
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      return {
+        data: null,
+        error: new Error(`Supabase returned an invalid response (${response.status}).`),
+      };
+    }
+  }
 
   if (!response.ok) {
     const message = data?.message || data?.error || text || `Request to ${table} failed`;

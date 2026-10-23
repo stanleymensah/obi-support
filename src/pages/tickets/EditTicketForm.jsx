@@ -1,13 +1,19 @@
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
+// import { useAuth } from "@/context/AuthContext";
 import Spinner from "@/components/ui/spinner";
 import { useUsers } from "@/hooks/useUsers";
-import { ASSIGNEE_DISPLAY_FIELD, buildAssigneePayload, findUserByAssigneeValue, getUserDisplayLabel } from "@/lib/assignee";
+import {
+  ASSIGNEE_DISPLAY_FIELD,
+  findUserByAssigneeValue,
+  getUserDisplayLabel,
+} from "@/lib/assignee";
 import { supabase } from "@/utils/supabase";
 
 export default function EditTicketForm({ onClose, ticket }) {
-  const { user, profile } = useAuth();
+  // const { user, profile } = useAuth();
+  const currentTicket = ticket || {};
   const { data: users = [] } = useUsers();
   const queryClient = useQueryClient();
 
@@ -22,43 +28,56 @@ export default function EditTicketForm({ onClose, ticket }) {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      title: ticket.title || "",
-      email: ticket?.email || "",
-      assigneeId: ticket.assigneeId || findUserByAssigneeValue(users, ticket.assignee)?.id || "",
-      description: ticket.description || "",
-      status: ticket.status || "Open",
+      title: currentTicket.title || "",
+      email: currentTicket.email || "",
+      assigneeId: currentTicket.assigneeId || findUserByAssigneeValue(users, currentTicket.assignee)?.id || "",
+      description: currentTicket.description || "",
+      status: currentTicket.status || "Open",
     },
   });
 
   const mutation = useMutation({
     mutationFn: async (updatedData) => {
       const payload = {
-        ...updatedData,
         assignee: updatedData.assigneeId || null,
+        description: updatedData.description,
+        email: updatedData.email,
+        status: updatedData.status,
+        title: updatedData.title,
       };
-      delete payload.assigneeId;
 
-      const { error } = await supabase.from("tickets").eq("id", ticket.id).update(payload);
+      const { error } = await supabase
+        .from("tickets")
+        .eq("id", currentTicket.id)
+        .update(payload);
       if (error) throw error;
 
       return payload;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tickets"] });
+      toast.success("Ticket updated successfully.", {
+        className: "bg-azure-pop text-white border-azure-pop",
+      });
       if (onClose) onClose();
+    },
+    onError: (error) => {
+      console.error("Error updating ticket:", error);
+      toast.error(error.message || "Failed to update ticket.", {
+        className: "bg-white text-rose-600 border-rose-200",
+      });
     },
   });
 
   const onSubmit = (data) => {
     const selectedUser = findUserByAssigneeValue(users, data.assigneeId);
-    mutation.mutate({
-      ...data,
-      ...buildAssigneePayload(selectedUser, ASSIGNEE_DISPLAY_FIELD),
-    });
+    mutation.mutate({ ...data, assigneeId: selectedUser?.id || "" });
   };
 
+  if (!ticket) return null;
+
   return (
-      <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+      <form className="flex flex-col gap-4 p-4" onSubmit={handleSubmit(onSubmit)}>
         <div className="title">
           <label className="label text-xs font-medium text-gray-600 ">
             Title

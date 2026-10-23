@@ -110,7 +110,7 @@ export default function CreateTicketForm({ onClose }) {
               )}
             </div>
 
-            <div className="email-ems grid grid-cols-3 gap-2">
+            <div className={`email-ems grid gap-2 ${profile?.role === "admin" ? "grid-cols-3" : "grid-cols-2"}`}>
               <div className="email col-span-1">
                 <label className="label text-xs font-medium text-gray-600 ">
                   Email

@@ -19,8 +19,8 @@ export default function Dashboard() {
   if (isLoading) return <div className="w-full flex items-center justify-center">Loading <Spinner /></div>;
 
   return (
-    <div className="container w-full gap-2 bg-sky-100 p-2 flex flex-col h-full">
-      <div className="relative hero h-60 md:h-48">
+    <div className="w-full min-w-0 gap-2 bg-sky-100 p-2 flex flex-col h-full">
+      <div className="relative hero h-60 md:h-48 w-full">
         <img
           src="/images/banner.jpg"
           alt=""
@@ -31,7 +31,7 @@ export default function Dashboard() {
           <span>This is your overall ticket props</span>
         </div>
 
-        <div className="cards absolute z-10 bottom-3 left-3 right-3 grid grid-cols-5 gap-2">
+        <div className="cards absolute z-10 bottom-3 left-3 right-3 min-w-0 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
           <StatCard value={total} label="Total" />
           <StatCard value={open} label="Open" />
           <StatCard value={closed} label="Closed" />
@@ -40,21 +40,21 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="charts flex flex-col md:grid md:grid-cols-2 gap-2 flex-1">
-        <div className="pie-chart flex flex-col justify-between gap-2 border-black/10 bg-white shadow-sm rounded-sm py-3 px-4 col-span-1">
+      <div className="charts flex flex-col md:grid md:grid-cols-2 gap-2 flex-1 w-full">
+        <div className="pie-chart flex h-[calc(100%-4rem)] flex-col justify-between gap-2 border-black/10 bg-white shadow-sm rounded-sm py-3 px-4 col-span-1">
           <div className="w-full">
             <h4>By Priority</h4>
           </div>
-          <div className="status">
+          <div className="status flex-1 min-h-0">
             <Status data={priorityData} />
           </div>
         </div>
 
-        <div className="pie-chart flex flex-col justify-between gap-2 border-black/10 px-4 bg-white shadow-sm rounded-sm py-3 col-span-1">
+        <div className="pie-chart flex h-[calc(100%-4rem)] flex-col justify-between gap-2 border-black/10 px-4 bg-white shadow-sm rounded-sm py-3 col-span-1">
           <div>
             <h4>By Status</h4>
           </div>
-          <div className="priority">
+          <div className="priority flex-1 min-h-0">
             <Priority data={statusData} />
           </div>
         </div>

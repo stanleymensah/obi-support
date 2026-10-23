@@ -1,6 +1,4 @@
-import { supabase } from "@/utils/supabase";
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+import { supabaseUrl } from "@/config/supabase";
 
 function getAccessToken() {
   if (typeof window === "undefined") {

@@ -11,7 +11,7 @@ import {
 
 export default function Priority({data}) {
   return (
-    <div className="h-58 w-full">
+    <div className="h-[calc(100%_-_2rem)] w-full">
         <ResponsiveContainer height="100%" width="100%">
         <BarChart
           data={data}

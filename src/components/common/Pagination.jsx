@@ -3,15 +3,34 @@ import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-r
 export default function Pagination({ pagination }) {
   const { 
     currentPage, totalPages, nextPage, prevPage, 
-    goToPage, hasNextPage, hasPrevPage, goToFirstPage, goToLastPage 
+    goToPage, hasNextPage, hasPrevPage, goToFirstPage, goToLastPage,
+    pageSize, changePageSize
   } = pagination;
 
-  if (totalPages <= 1) return null;
+  const pageSizeOptions = [...new Set([5, 10, 20, 50, pageSize])].sort((a, b) => a - b);
 
   return (
     <div className="flex flex-col md:flex-row items-center justify-between gap-3 px-4 py-1 bg-white border-t border-gray-100">
-      <div className="text-xs text-gray-500 order-2 md:order-1">
-        Page <span className="font-bold text-gray-700">{currentPage}</span> of <span className="font-bold text-gray-700">{totalPages}</span>
+      <div className="flex items-center gap-3 text-xs text-gray-500 order-2 md:order-1">
+        <span>
+          Page <span className="font-bold text-gray-700">{currentPage}</span> of <span className="font-bold text-gray-700">{totalPages}</span>
+        </span>
+        <label className="flex items-center gap-1">
+          <span>Show</span>
+          <select
+            value={pageSize}
+            onChange={(event) => changePageSize(Number(event.target.value))}
+            className="rounded border border-gray-200 bg-white px-1.5 py-1 text-xs text-gray-700 outline-none focus:border-azure-pop"
+            aria-label="Items per page"
+          >
+            {pageSizeOptions.map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
+          <span>per page</span>
+        </label>
       </div>
 
       <div className="flex items-center gap-2 order-1 md:order-2">

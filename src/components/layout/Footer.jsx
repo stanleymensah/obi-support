@@ -10,7 +10,7 @@ export default function Footer() {
         <span className="text-xs">&copy; {currentYear} </span>
       </div>
       <div>
-        <span className="text-xs">Powered by Supabase</span>
+        <span className="text-xs">Powered by <Link to={"https://supabase.com/"} target="_blank" className="hover:underline hover:text-blue-600">Supabase</Link></span>
       </div>
     </footer>
   );

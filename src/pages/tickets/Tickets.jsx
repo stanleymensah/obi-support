@@ -3,6 +3,7 @@ import { useTickets } from "@/hooks/useTickets";
 import { useState } from "react";
 import CreateTicketForm from "./CreateTicketForm";
 import Modal from "@/components/common/Modal";
+import TicketSidebar from "@/components/common/TicketSidebar";
 import { useDeleteTicket } from "@/hooks/useDeleteTicket";
 import ConfirmModal from "@/components/common/ConfirmModal";
 import EditTicketForm from "./EditTicketForm";
@@ -13,7 +14,10 @@ import TicketComments from "./Comments";
 import { useAuth } from "@/context/AuthContext";
 import { useMemo } from "react";
 import { sortByCreatedAt } from "@/lib/utils";
-import { buildAssigneePayload, isTicketAssignedToProfile } from "@/lib/assignee";
+import {
+  buildAssigneePayload,
+  isTicketAssignedToProfile,
+} from "@/lib/assignee";
 import Spinner from "@/components/ui/spinner";
 import usePagination from "@/hooks/usePagination";
 import { useTicketFilters } from "@/hooks/useTicketFilters";
@@ -22,7 +26,12 @@ import { useUsers } from "@/hooks/useUsers";
 import { useUpdateTicket } from "@/hooks/useUpdateTicket";
 
 export default function Tickets({ assignedOnly = false }) {
-  const { data: tickets, isLoading, error, refetch: refetchTickets } = useTickets();
+  const {
+    data: tickets,
+    isLoading,
+    error,
+    refetch: refetchTickets,
+  } = useTickets();
   const { data: users } = useUsers();
   const [isCreating, setIsCreating] = useState(false);
   const deleteMutation = useDeleteTicket();
@@ -40,14 +49,16 @@ export default function Tickets({ assignedOnly = false }) {
   const { profile, user } = useAuth();
   const [sortOrder, setSortOrder] = useState("asc");
   const [confirmText, setConfirmText] = useState("");
-const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
+  const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
 
-
+  // const SIDEBAR_WIDTH = "24rem";
   const debouncedSearch = useDebounce(searchTerm);
 
   const baseTickets = useMemo(() => {
     if (assignedOnly && profile) {
-      return (tickets || []).filter((t) => isTicketAssignedToProfile(t, profile, user?.uid));
+      return (tickets || []).filter((t) =>
+        isTicketAssignedToProfile(t, profile, user?.uid),
+      );
     }
 
     return tickets || [];
@@ -63,8 +74,14 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
     priorityFilter,
     setPriorityFilter,
     filteredTickets,
-  } = useTicketFilters(tickets, sortedTickets, debouncedSearch);
-  const pagination = usePagination(filteredTickets, 7);
+  } = useTicketFilters(
+    tickets,
+    sortedTickets,
+    debouncedSearch,
+    profile,
+    user?.uid,
+  );
+  const pagination = usePagination(filteredTickets, 10);
 
   const handleComment = (ticket) => {
     setCommentTicket(ticket);
@@ -130,7 +147,9 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
       updates,
     });
 
-    setTicketToView((current) => (current ? { ...current, ...updates } : current));
+    setTicketToView((current) =>
+      current ? { ...current, ...updates } : current,
+    );
     if (Object.prototype.hasOwnProperty.call(updates, "assigneeId")) {
       setWorkflowAssigneeId(updates.assigneeId || "");
     }
@@ -140,7 +159,9 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
   };
 
   const handleAssignAssignee = async () => {
-    const selectedUser = (users || []).find((candidate) => candidate?.id === workflowAssigneeId);
+    const selectedUser = (users || []).find(
+      (candidate) => candidate?.id === workflowAssigneeId,
+    );
     await commitWorkflowUpdate({
       ...buildAssigneePayload(selectedUser),
       status: "Assigned",
@@ -169,7 +190,6 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
         Loading tickets <Spinner />
       </div>
     );
-    
 
   return (
     <>
@@ -196,6 +216,7 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
                 className="text-xs border py-1 px-2 rounded-sm bg-white"
               >
                 <option value="all">All Status</option>
+                <option value="assigned_to_me">Assigned to me</option>
                 <option value="Open">Open</option>
                 <option value="In Progress">In Progress</option>
                 {/* etc... */}
@@ -256,50 +277,71 @@ const targetTicket = (tickets || []).find((t) => t.id === ticketToDelete);
         )}
       </div>
 
-      {isCreating && (
+      {/* {isCreating && (
         <Modal size="sm" title="Create" onClose={() => setIsCreating(false)}>
           <CreateTicketForm onClose={() => setIsCreating(false)} />
         </Modal>
-      )}
+      )} */}
 
-      {isComment && (
-        <Modal size="md" title="Comment" onClose={handleCloseComment}>
-          <TicketComments ticketId={commentTicket.id} profile={profile} />
-        </Modal>
-      )}
+      <TicketSidebar
+      open={isCreating}
+      onClose={() => setIsCreating(false)}
+      title={"Create"}
+      contentClassName="p-4"
+      >
+        <CreateTicketForm onClose={() => setIsCreating(false)} />
+      </TicketSidebar>
 
-      {isEditing && (
+
+      {/* {isEditing && (
         <Modal size="sm" title="Edit Ticket" onClose={handleCancelEdit}>
           <EditTicketForm ticket={ticketToEdit} onClose={handleCancelEdit} />
         </Modal>
-      )}
+      )} */}
 
-      {isViewing && (
-        <Modal size="md" title="Details" onClose={handleCloseView} scaler="xl">
-          {(() => {
-            // Only allow workflow actions if user is admin or assigned to the ticket
-            const isAdmin = profile?.role === "admin";
-            const isAssigned = isTicketAssignedToProfile(ticketToView, profile, user?.uid);
-            const canManageTickets = isAdmin || isAssigned;
+      <TicketSidebar
+        open={isEditing}
+        onClose={handleCancelEdit}
+        title="Edit"
+      >
+        {isEditing && ticketToEdit && (
+          <EditTicketForm ticket={ticketToEdit} onClose={handleCancelEdit} />
+        )}
+      </TicketSidebar>
 
-            return (
-                <TicketDetails
-                  ticket={ticketToView}
-                  users={users || []}
-                  profile={profile}
-                  effectiveAssignee={workflowAssigneeId}
-                  canManageTickets={canManageTickets}
-                  onAssigneeChange={setWorkflowAssigneeId}
-                  onAssign={handleAssignAssignee}
-                  onStartWork={handleStartWork}
-                  onMarkResolved={handleMarkResolved}
-                  onCloseTicket={handleCloseTicket}
-                  onReopenTicket={handleReopenTicket}
-                />
-            );
-          })()}
-        </Modal>
-      )}
+      <TicketSidebar
+        open={isViewing}
+        onClose={handleCloseView}
+        title="Details"
+        contentClassName="min-w-0 overflow-x-hidden px-4"
+      >
+        {(() => {
+          // Only allow workflow actions if user is admin or assigned to the ticket
+          const isAdmin = profile?.role === "admin";
+          const isAssigned = isTicketAssignedToProfile(
+            ticketToView,
+            profile,
+            user?.uid,
+          );
+          const canManageTickets = isAdmin || isAssigned;
+
+          return (
+            <TicketDetails
+              ticket={ticketToView}
+              users={users || []}
+              profile={profile}
+              effectiveAssignee={workflowAssigneeId}
+              canManageTickets={canManageTickets}
+              onAssigneeChange={setWorkflowAssigneeId}
+              onAssign={handleAssignAssignee}
+              onStartWork={handleStartWork}
+              onMarkResolved={handleMarkResolved}
+              onCloseTicket={handleCloseTicket}
+              onReopenTicket={handleReopenTicket}
+            />
+          );
+        })()}
+      </TicketSidebar>
 
       {isDeleting && (
         <ConfirmModal
